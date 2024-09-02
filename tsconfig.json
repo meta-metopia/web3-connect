@@ -17,6 +17,7 @@
     "skipLibCheck": true,
     "declaration": true,
     "declarationMap": true,
-    "target": "es5"
+    "target": "es5",
+    "module": "commonjs"
   }
 }

@@ -14,7 +14,6 @@ import { MetaMaskMockProvider, Sdk, WalletProvider } from "../../sdk";
 
 import { Web3ModalOptions } from "@web3modal/ethers";
 import { AvailableProvider } from "../../common/availableProviders";
-import { WalletConnectProvider } from "../../providers/walletconnect";
 import { SdkInterface, SignInCallbacks } from "../../sdk";
 import { useEnvironment } from "../environment/EnvironmentContext";
 
@@ -55,7 +54,7 @@ interface WalletProviderOptions {
    * This field is optional and will override existing providers if needed.
    */
   providers: (new (
-    args: any,
+    ...args: any[]
   ) => WalletProvider)[];
 
   onSignedOut: () => Promise<void>;
@@ -108,16 +107,12 @@ function WalletContextProvider({
       // to avoid this error.
 
       for (const provider of providers ?? []) {
-        sdk.registerProvider(new provider(globalWindow));
+        sdk.registerProvider(new provider(globalWindow, walletConnectConfig));
       }
 
       // If the environment is e2e, use the mock provider
       if (typeof environment === "object" && environment.env === "e2e") {
         sdk.registerProvider(new MetaMaskMockProvider(environment.endpoint));
-      }
-
-      if (walletConnectConfig) {
-        sdk.registerProvider(new WalletConnectProvider(walletConnectConfig));
       }
 
       if (!isTest) await sleep(500);

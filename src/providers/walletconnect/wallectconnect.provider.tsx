@@ -6,7 +6,7 @@ import {
   createWeb3Modal,
 } from "@web3modal/ethers";
 import { ethers } from "ethers";
-import { ConnectionResponse } from "../../sdk/sdk.interface";
+import { ConnectionResponse } from "../../sdk";
 import {
   MetaData,
   SignMessageOptions,
@@ -19,7 +19,7 @@ export class WalletConnectProvider implements WalletProvider {
   private hasSignedIn = false;
   private isEnable = false;
 
-  constructor(options: Web3ModalOptions) {
+  constructor(_: any, options: Web3ModalOptions) {
     try {
       this.modal = createWeb3Modal(options);
       this.getWalletAddress().then((address) => {

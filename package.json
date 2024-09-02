@@ -6,6 +6,8 @@
   "publishConfig": {
     "access": "public"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -34,6 +36,7 @@
     "@types/react": "^18.3.1",
     "@types/ua-parser-js": "^0.7.39",
     "@web3modal/ethers": "^4.2.3",
+    "@web3modal/scaffold-utils": "^5.1.4",
     "ethers": "^6.13.2",
     "jose": "^5.8.0",
     "pino-pretty": "^11.2.2",
