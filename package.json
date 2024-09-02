@@ -1,0 +1,54 @@
+{
+  "name": "web3-connect-react",
+  "version": "0.0.1",
+  "description": "",
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./providers": {
+      "types": "./dist/providers/index.d.ts",
+      "default": "./dist/providers/index.js"
+    },
+    "./test": {
+      "types": "./dist/test/index.d.ts",
+      "default": "./dist/test/index.js"
+    }
+  },
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "format": "biome format --write .",
+    "build": "rm -rf dist && tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@biomejs/biome": "^1.8.3",
+    "@types/jest": "^29.5.12",
+    "@types/react": "^18.3.1",
+    "@types/ua-parser-js": "^0.7.39",
+    "@web3modal/ethers": "^4.2.3",
+    "ethers": "^6.13.2",
+    "jose": "^5.8.0",
+    "pino-pretty": "^11.2.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "swr": "^2.2.5",
+    "typescript": "^5.4.5",
+    "ua-parser-js": "^1.0.37"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^15.0.5",
+    "fastify": "^4.27.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.1.2"
+  }
+}

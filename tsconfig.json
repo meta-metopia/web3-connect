@@ -1,0 +1,22 @@
+{
+  "include": ["."],
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules",
+    "examples",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/setupTests.tsx"
+  ],
+  "compilerOptions": {
+    "lib": ["ES2017", "DOM"],
+    "outDir": "./dist",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "target": "es5"
+  }
+}
