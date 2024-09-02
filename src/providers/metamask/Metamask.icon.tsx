@@ -1,4 +1,8 @@
-export function MetaMaskIcon() {
+interface Props {
+  className?: string;
+}
+
+export function MetaMaskIcon({ className }: Props) {
   return (
     // biome-ignore lint/a11y/noSvgWithoutTitle: <explanation>
     <svg
@@ -10,6 +14,7 @@ export function MetaMaskIcon() {
         height: "100%",
         width: "100%",
       }}
+      className={className}
     >
       <path
         d="M28.3853 0L16.7831 8.6532L18.9286 3.54793L28.3853 0Z"

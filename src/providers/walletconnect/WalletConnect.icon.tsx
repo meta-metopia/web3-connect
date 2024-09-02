@@ -1,4 +1,8 @@
-export function WalletConnectIcon() {
+interface Props {
+  className?: string;
+}
+
+export function WalletConnectIcon({ className }: Props) {
   return (
     // biome-ignore lint/a11y/noSvgWithoutTitle: <explanation>
     <svg
@@ -7,6 +11,7 @@ export function WalletConnectIcon() {
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       style={{
         objectFit: "contain",
         height: "100%",
