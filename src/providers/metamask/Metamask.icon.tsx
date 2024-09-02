@@ -2,11 +2,14 @@ export function MetaMaskIcon() {
   return (
     // biome-ignore lint/a11y/noSvgWithoutTitle: <explanation>
     <svg
-      width="30"
-      height="28"
       viewBox="0 0 30 28"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      style={{
+        objectFit: "contain",
+        height: "100%",
+        width: "100%",
+      }}
     >
       <path
         d="M28.3853 0L16.7831 8.6532L18.9286 3.54793L28.3853 0Z"

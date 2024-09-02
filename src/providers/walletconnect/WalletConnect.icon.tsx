@@ -1,11 +1,17 @@
 export function WalletConnectIcon() {
   return (
+    // biome-ignore lint/a11y/noSvgWithoutTitle: <explanation>
     <svg
       width="48"
       height="48"
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      style={{
+        objectFit: "contain",
+        height: "100%",
+        width: "100%",
+      }}
     >
       <rect width="48" height="48" rx="16" fill="url(#pattern0_241_934)" />
       <defs>
