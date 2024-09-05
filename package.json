@@ -1,6 +1,6 @@
 {
   "name": "web3-connect-react",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "files": ["dist"],
   "publishConfig": {
@@ -25,7 +25,8 @@
   "scripts": {
     "test": "jest --passWithNoTests",
     "format": "biome format --write .",
-    "build": "rm -rf dist && tsc"
+    "build": "rm -rf dist && tsc",
+    "prepublish": "pnpm build"
   },
   "keywords": [],
   "author": "",
