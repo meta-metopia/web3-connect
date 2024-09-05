@@ -59,6 +59,18 @@ interface WalletProviderOptions {
 
   onSignedOut: () => Promise<void>;
 
+  /**
+   * Should react to account changes?
+   * @default true
+   */
+  listenToAccountChanges?: boolean;
+
+  /**
+   * Should react to chain changes?
+   * @default true
+   */
+  listenToChainChanges?: boolean;
+
   environment?: {
     env: "e2e";
     endpoint: string;
@@ -72,6 +84,8 @@ function WalletContextProvider({
   providers,
   environment,
   onSignedOut,
+  listenToAccountChanges = true,
+  listenToChainChanges = true,
 }: WalletProviderOptions) {
   const [isSignedIn, setIsSignedIn] = useState(session.isAuth);
   const [isLoading, setIsLoading] = useState(true);
@@ -132,18 +146,21 @@ function WalletContextProvider({
         setChainId(chainId);
         setIsLoading(false);
         // Listen to account changes
-        sdk.onAccountsChanged(async (account) => {
-          if (account !== session.walletAddress) {
-            await onSignedOut();
+        if (listenToAccountChanges) {
+          sdk.onAccountsChanged(async (account) => {
+            if (account !== session.walletAddress) {
+              await onSignedOut();
+              window.location.reload();
+              return;
+            }
             window.location.reload();
-            return;
-          }
-          window.location.reload();
-        });
-        // eslint-disable-next-line
-        sdk.onChainChanged(async () => {
-          window.location.reload();
-        });
+          });
+        }
+        if (listenToChainChanges) {
+          sdk.onChainChanged(async () => {
+            window.location.reload();
+          });
+        }
       } catch (e) {
         console.error(e);
         setIsLoading(false);
