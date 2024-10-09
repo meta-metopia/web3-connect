@@ -1,6 +1,6 @@
+import { SessionRequest, SessionResponse } from "../common";
 import { AvailableProvider } from "../common/availableProviders";
-import { SessionRequest, SessionResponse } from "../common/session";
-import { WalletProvider } from "../providers/provider.interface";
+import { WalletProvider } from "../providers";
 
 export type ConnectAction = "skip" | "continue";
 
