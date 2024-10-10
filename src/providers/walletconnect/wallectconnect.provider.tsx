@@ -185,4 +185,14 @@ export class WalletConnectProvider implements WalletProvider {
   isVisible(): boolean {
     return true;
   }
+
+  addNetwork(
+    targetChainId: number,
+    targetRpc: string,
+    targetNetworkName: string,
+    targetSymbol: string,
+    blockExplorerUrl: string,
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }
