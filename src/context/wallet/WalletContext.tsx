@@ -191,7 +191,6 @@ function WalletContextProvider({
         return;
       }
       setIsSignedIn(true);
-      window.location.reload();
     },
     [sdk],
   );
