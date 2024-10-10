@@ -163,13 +163,17 @@ export class Sdk implements SdkInterface {
     if (!this.provider) {
       throw new Error("No provider founded");
     }
-    await this.provider.addNetwork(
-      opts.chainId,
-      opts.rpcUrl,
-      opts.networkName,
-      opts.symbol,
-      opts.blockExplorerUrl,
-    );
+    await this.provider
+      .addNetwork(
+        opts.chainId,
+        opts.rpcUrl,
+        opts.networkName,
+        opts.symbol,
+        opts.blockExplorerUrl,
+      )
+      .catch(() => {
+        console.error("Failed to add network");
+      });
     await this.provider.switchNetwork(opts.chainId);
   }
 
