@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import Fastify, { FastifyInstance } from "fastify";
-import { MockHttpProvider } from "../../test/mockProviders";
-import { MetaMaskMockProvider } from "./metamask.mock.provider.ts";
+import { MockHttpProvider } from "../../test";
+import { MetaMaskMockProvider } from "./metamask.mock.provider";
 
 describe("MetamaskMockProvider", () => {
   let provider: MetaMaskMockProvider;
@@ -76,16 +76,15 @@ describe("MetamaskMockProvider", () => {
 
   it("should be able to sign a message", async () => {
     const message = "Hello World";
-    const signature = await provider.signMessage(message, {});
+    const signature = await provider.signMessage(message, {
+      forAuthentication: false,
+    });
     expect(signature).toBeDefined();
   });
 
   it("should be able to switch network", async () => {
-    await provider.switchNetwork(
-      3,
-      "https://ropsten.infura.io/v3/YOUR-PROJECT-ID",
-      true,
-    );
+    await provider.addNetwork(3, "http://localhost:8545", "Ropsten", "ETH", "");
+    await provider.switchNetwork(3);
     const chainId = await provider.chainId();
     expect(chainId).toEqual(3);
   });

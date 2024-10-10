@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { ConnectionResponse } from "../sdk/sdk.interface";
+import { ConnectionResponse } from "../sdk";
 import {
   EIP1193Provider,
   MetaData,
@@ -87,14 +87,39 @@ export class BaseProvider implements WalletProvider {
     return recoveredAddress === walletAddress;
   }
 
+  async addNetwork(
+    targetChainId: number,
+    targetRpc: string,
+    targetNetworkName: string,
+    targetSymbol: string,
+    blockExplorerUrl: string,
+  ): Promise<void> {
+    if (this.provider === undefined) {
+      throw new Error("Provider not found");
+    }
+
+    await this.provider.request({
+      method: "wallet_addEthereumChain",
+      params: [
+        {
+          chainId: this.toHex(targetChainId),
+          chainName: targetNetworkName,
+          nativeCurrency: {
+            name: targetSymbol,
+            symbol: targetSymbol,
+            decimals: 18,
+          },
+          rpcUrls: [targetRpc],
+          blockExplorerUrls: [blockExplorerUrl],
+        },
+      ],
+    });
+  }
+
   /**
    * Switch to the target network
    */
-  async switchNetwork(
-    targetChainId: number,
-    targetRpc: string,
-    shouldAdd: boolean,
-  ): Promise<void> {
+  async switchNetwork(targetChainId: number): Promise<void> {
     if (this.provider === undefined) {
       throw new Error("Provider not found");
     }
@@ -103,26 +128,6 @@ export class BaseProvider implements WalletProvider {
     // check if the current chainId is the same as the target chainId
     if (chainId === this.toHex(targetChainId)) {
       return;
-    }
-
-    if (shouldAdd) {
-      // add the target network
-      await this.provider.request({
-        method: "wallet_addEthereumChain",
-        params: [
-          {
-            chainId: this.toHex(targetChainId),
-            chainName: "Axiomledger Gemini",
-            nativeCurrency: {
-              name: "Axiomesh",
-              symbol: "AXC",
-              decimals: 18,
-            },
-            rpcUrls: [targetRpc],
-            blockExplorerUrls: ["https://scan.gemini.axiomesh.io"],
-          },
-        ],
-      });
     }
 
     // switch to the target network

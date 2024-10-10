@@ -1,5 +1,5 @@
 import { SessionRequest, SessionResponse } from "../common";
-import { AvailableProvider } from "../common/availableProviders";
+import { AvailableProvider } from "../common";
 import { WalletProvider } from "../providers";
 
 export type ConnectAction = "skip" | "continue";
@@ -14,6 +14,8 @@ export interface SwitchToNetworkOptions {
   networkName: string;
 
   symbol: string;
+
+  blockExplorerUrl?: string;
 }
 
 export interface ConnectionResponse {

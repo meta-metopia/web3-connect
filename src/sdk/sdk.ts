@@ -98,11 +98,14 @@ export class Sdk implements SdkInterface {
     }
 
     if (opts.network) {
-      await selectedProvider.switchNetwork(
+      await selectedProvider.addNetwork(
         opts.network.chainId,
         opts.network.rpcUrl,
-        true,
+        opts.network.networkName,
+        opts.network.symbol,
+        opts.network.blockExplorerUrl,
       );
+      await selectedProvider.switchNetwork(opts.network.chainId);
     }
 
     const data = await opts.callbacks?.getSignInData(
@@ -142,8 +145,32 @@ export class Sdk implements SdkInterface {
     this.provider.onAccountsChanged(callback);
   }
 
+  async addNetwork(network: SwitchToNetworkOptions): Promise<void> {
+    if (!this.provider) {
+      throw new Error("No provider founded");
+    }
+
+    await this.provider.addNetwork(
+      network.chainId,
+      network.rpcUrl,
+      network.networkName,
+      network.symbol,
+      network.blockExplorerUrl,
+    );
+  }
+
   async switchToNetwork(opts: SwitchToNetworkOptions): Promise<void> {
-    await this.provider.switchNetwork(opts.chainId, opts.rpcUrl, true);
+    if (!this.provider) {
+      throw new Error("No provider founded");
+    }
+    await this.provider.addNetwork(
+      opts.chainId,
+      opts.rpcUrl,
+      opts.networkName,
+      opts.symbol,
+      opts.blockExplorerUrl,
+    );
+    await this.provider.switchNetwork(opts.chainId);
   }
 
   onChainChanged(callback: (chainId: number) => void): void {

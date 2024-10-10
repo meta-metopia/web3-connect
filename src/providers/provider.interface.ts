@@ -103,13 +103,23 @@ export interface WalletProvider {
   /**
    * Switch to a different network
    * @param targetChainId The chain id of the target network
-   * @param targetRpc The rpc url of the target network
-   * @param shouldAdd Whether to add the network if it doesn't exist
    */
-  switchNetwork(
+  switchNetwork(targetChainId: number): Promise<void>;
+
+  /**
+   * Add a network to the wallet provider
+   * @param targetChainId
+   * @param targetRpc
+   * @param targetNetworkName
+   * @param targetSymbol
+   * @param blockExplorerUrl
+   */
+  addNetwork(
     targetChainId: number,
     targetRpc: string,
-    shouldAdd: boolean,
+    targetNetworkName: string,
+    targetSymbol: string,
+    blockExplorerUrl: string,
   ): Promise<void>;
 
   /**

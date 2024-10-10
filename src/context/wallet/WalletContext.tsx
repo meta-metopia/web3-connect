@@ -10,10 +10,15 @@ import {
 } from "react";
 import useSWR, { mutate } from "swr";
 import { SessionResponse } from "../../common";
-import { MetaMaskMockProvider, Sdk, WalletProvider } from "../../sdk";
+import {
+  MetaMaskMockProvider,
+  Sdk,
+  SwitchToNetworkOptions,
+  WalletProvider,
+} from "../../sdk";
 
 import { Web3ModalOptions } from "@web3modal/ethers";
-import { AvailableProvider } from "../../common/availableProviders";
+import { AvailableProvider } from "../../common";
 import { SdkInterface, SignInCallbacks } from "../../sdk";
 import { useEnvironment } from "../environment/EnvironmentContext";
 
@@ -30,6 +35,7 @@ interface IWalletContext {
     callbacks: SignInCallbacks,
   ) => Promise<void>;
   signOut: () => Promise<void>;
+  switchNetwork: (network: SwitchToNetworkOptions) => Promise<void>;
 }
 
 const WalletContext = createContext<IWalletContext>({} as any);
@@ -156,11 +162,13 @@ function WalletContextProvider({
             window.location.reload();
           });
         }
-        if (listenToChainChanges) {
-          sdk.onChainChanged(async () => {
+
+        sdk.onChainChanged(async () => {
+          setChainId(await sdk.provider.chainId());
+          if (listenToChainChanges) {
             window.location.reload();
-          });
-        }
+          }
+        });
       } catch (e) {
         console.error(e);
         setIsLoading(false);
@@ -194,8 +202,17 @@ function WalletContextProvider({
     }
     await sdk.signOut();
     await onSignedOut();
-    window.location.reload();
   }, [sdk]);
+
+  const switchNetwork = useCallback(
+    async (network: SwitchToNetworkOptions) => {
+      if (!sdk) {
+        throw new Error("SDK is not initialized");
+      }
+      await sdk.switchToNetwork(network);
+    },
+    [sdk],
+  );
 
   const value: IWalletContext = {
     session,
@@ -207,6 +224,7 @@ function WalletContextProvider({
     walletAddress,
     signIn,
     signOut,
+    switchNetwork,
   };
 
   return (
