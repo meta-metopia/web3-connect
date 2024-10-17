@@ -1,8 +1,10 @@
 {
   "name": "web3-connect-react",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },
