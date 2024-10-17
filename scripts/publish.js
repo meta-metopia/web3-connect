@@ -1,7 +1,9 @@
 const execSync = require("child_process").execSync;
 
 // get latest version from command line
-const version = process.argv[2];
+let version = process.argv[2];
+// remove any leading 'v'
+version = version.replace(/^v/, "");
 
 // update package.json
 const fs = require("fs");

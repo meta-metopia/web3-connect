@@ -21,5 +21,8 @@ jobs:
           node-version: "20"
           cache: "pnpm"
       - run: pnpm install
+      - run: pnpm build
+        name: Build
       - run: node scripts/publish.js ${{ github.event.release.tag_name }}
+        name: Publish to NPM
 
