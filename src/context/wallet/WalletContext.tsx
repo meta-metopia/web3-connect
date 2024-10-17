@@ -106,7 +106,7 @@ function WalletContextProvider({
       if (!isSignedIn) {
         return "0";
       }
-      return ethers.formatEther(await sdk.provider.getBalance());
+      return ethers.formatEther(await sdk.getBalance());
     },
     {
       refreshInterval: 10_000,
