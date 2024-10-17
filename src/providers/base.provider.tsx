@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { callContractMethod } from "../common/contract.utils";
 import { ConnectionResponse } from "../sdk";
 import {
   EIP1193Provider,
@@ -172,6 +173,67 @@ export class BaseProvider implements WalletProvider {
 
     this.provider.on("accountsChanged", (accounts: string[]) => {
       callback(accounts[0]);
+    });
+  }
+
+  async sendTransaction(
+    to: string,
+    value: string,
+    data?: string,
+  ): Promise<string> {
+    if (this.provider === undefined) {
+      throw new Error("Provider not found");
+    }
+
+    const from = await this.getWalletAddress();
+    if (!from) {
+      throw new Error("No wallet address found");
+    }
+
+    const transactionParameters = {
+      to,
+      from,
+      value: "0x" + ethers.parseEther(value).toString(16),
+      data: data || "0x",
+    };
+
+    try {
+      const txHash = await this.provider.request({
+        method: "eth_sendTransaction",
+        params: [transactionParameters],
+      });
+
+      return txHash;
+    } catch (error) {
+      console.error("Error sending transaction:", error);
+      throw new Error("Failed to send transaction");
+    }
+  }
+
+  async callContractMethod(
+    contractAddress: string,
+    abi: any[],
+    methodName: string,
+    params: any[],
+    value = "0",
+  ): Promise<string> {
+    if (this.provider === undefined) {
+      throw new Error("Provider not found");
+    }
+
+    const fromAddress = await this.getWalletAddress();
+    if (!fromAddress) {
+      throw new Error("No wallet address found");
+    }
+
+    return callContractMethod({
+      provider: this.provider,
+      contractAddress,
+      abi,
+      methodName,
+      fromAddress,
+      params,
+      value,
     });
   }
 

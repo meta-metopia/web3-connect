@@ -34,6 +34,17 @@ describe("BaseProvider", () => {
           return true;
         }
 
+        if (request.method === "eth_sendTransaction") {
+          const txParams = request.params![0];
+          // Mock a transaction hash
+          return "0x" + "1".repeat(64);
+        }
+
+        if (request.method === "eth_call") {
+          // Mock a successful contract call
+          return "0x0000000000000000000000000000000000000000000000000000000000000001";
+        }
+
         if (request.method === "personal_sign") {
           // use ethers to sign the message
           const message = request.params![0];
@@ -106,11 +117,11 @@ describe("BaseProvider", () => {
   });
 
   it("should be able to switch network", async () => {
-    await walletProvider.switchNetwork(1, "http://localhost:8545", false);
+    await walletProvider.switchNetwork(1);
   });
 
   it("should be able to switch network", async () => {
-    await walletProvider.switchNetwork(1, "http://localhost:8545", true);
+    await walletProvider.switchNetwork(1);
   });
 
   it("should be able to get chain id", async () => {
@@ -140,5 +151,42 @@ describe("BaseProvider", () => {
   // eslint-disable-next-line
   it("should be able to init", async () => {
     walletProvider.init();
+  });
+
+  it("should be able to send a transaction", async () => {
+    const to = "0x1234567890123456789012345678901234567890";
+    const value = "1000000000000000000"; // 1 ETH in wei
+    const data = "0x";
+
+    const txHash = await walletProvider.sendTransaction(to, value, data);
+
+    expect(txHash).toBeDefined();
+    expect(txHash).toMatch(/^0x[a-fA-F0-9]{64}$/);
+  });
+
+  it("should throw an error when sending a transaction without a provider", async () => {
+    const walletProviderWithoutProvider = new BaseProvider({} as any);
+
+    await expect(
+      walletProviderWithoutProvider.sendTransaction(
+        "0x1234567890123456789012345678901234567890",
+        "1000000000000000000",
+        "0x",
+      ),
+    ).rejects.toThrow("Provider not found");
+  });
+
+  it("should throw an error when calling a contract method without a provider", async () => {
+    const walletProviderWithoutProvider = new BaseProvider({} as any);
+
+    await expect(
+      walletProviderWithoutProvider.callContractMethod(
+        "0x1234567890123456789012345678901234567890",
+        [],
+        "someMethod",
+        [],
+        "0",
+      ),
+    ).rejects.toThrow("Provider not found");
   });
 });

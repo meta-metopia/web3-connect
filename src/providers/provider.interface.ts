@@ -81,6 +81,62 @@ export interface WalletProvider {
   connect(): Promise<ConnectionResponse>;
 
   /**
+   * Send a transaction on the blockchain
+   * @param to The recipient's Ethereum address
+   * @param value The amount of Ether to send, as a string (e.g., "0.1" for 0.1 ETH)
+   * @param data Optional data to include in the transaction. Use this for contract interactions.
+   * @returns A Promise that resolves to the transaction hash
+   * @throws Will throw an error if the transaction fails to send
+   *
+   * @example
+   * // Sending 0.1 ETH to an address
+   * const txHash = await sendTransaction("0x1234...", "0.1");
+   *
+   * @example
+   * // Interacting with a contract
+   * const data = "0x..."; // Encoded contract method call
+   * const txHash = await sendTransaction("0xContractAddress...", "0", data);
+   */
+  sendTransaction(to: string, value: string, data?: string): Promise<string>;
+
+  /**
+   * Call a specific method on a smart contract
+   * @param contractAddress The Ethereum address of the smart contract
+   * @param abi The ABI (Application Binary Interface) of the contract method
+   * @param method The name of the method to call on the contract
+   * @param params An array of parameters to pass to the contract method
+   * @param value The amount of Ether to send with the transaction, as a string in wei
+   * @returns A Promise that resolves to the transaction hash
+   * @throws Will throw an error if the contract call fails
+   *
+   * @example
+   * // Calling a 'transfer' method on an ERC20 token contract
+   * const txHash = await callContractMethod(
+   *   "0xContractAddress...",
+   *   [{...}], // ABI
+   *   "transfer",
+   *   ["0xRecipient...", "1000000000000000000"], // 1 token with 18 decimals
+   *   "0" // No ETH sent
+   * );
+   *
+   * @example
+   * // Calling a 'mint' method on an ERC721 token contract with 1 ETH
+   * const txHash = await callContractMethod(
+   *  "0xContractAddress...",
+   *  [{...}], // ABI
+   *  "mint",
+   *  ["0xRecipient...", "1"], // Token ID
+   *  "1000000000000000000" // 1 ETH
+   */
+  callContractMethod(
+    contractAddress: string,
+    abi: any,
+    method: string,
+    params?: any[],
+    value?: string,
+  ): Promise<string>;
+
+  /**
    * Listen to account changes. If account is undefined, the user has signed out
    */
   onAccountsChanged(callback: (account: string | undefined) => void): void;

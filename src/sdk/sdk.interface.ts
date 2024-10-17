@@ -43,6 +43,8 @@ export interface SignInOptions {
   callbacks?: SignInCallbacks;
 }
 
+export type SupportedChain = "evm" | "solana";
+
 export interface SdkInterface {
   /**
    * Check if the server session is valid using the following methods:
@@ -73,6 +75,94 @@ export interface SdkInterface {
   switchToNetwork(opts: SwitchToNetworkOptions): Promise<void>;
 
   onChainChanged(callback: (chainId: number) => void): void;
+
+  /**
+   * Get the wallet address by the list of supported chains
+   * @param args The list of supported chains
+   *
+   * @example
+   * // Get the wallet address for Ethereum
+   * const ethAddress = await getWalletAddress("evm"); // "0x1234..."
+   *
+   * @example
+   * // Get the wallet address for multiple chains
+   * const [ethAddress, solAddress] = await getWalletAddress("evm", "solana");
+   *
+   */
+  getWalletAddress(
+    ...args: SupportedChain[]
+  ): Promise<string | string[] | undefined>;
+
+  /**
+   * get balance of the wallet address for the supported chains
+   * @param args The list of supported chains
+   * @returns A Promise that resolves to the balance of the wallet address
+   * @throws Will throw an error if the balance cannot be retrieved
+   * @example
+   * // Get the balance for Ethereum
+   * const ethBalance = await getBalance("evm"); // "1000000000000000000"
+   *
+   * @example
+   * // Get the balance for multiple chains
+   * const [ethBalance, solBalance] = await getBalance("evm", "solana");
+   */
+  getBalance(...args: SupportedChain[]): Promise<string>;
+
+  /**
+   * Send a transaction on the blockchain
+   * @param to The recipient's Ethereum address
+   * @param value The amount of Ether to send, as a string (e.g., "0.1" for 0.1 ETH)
+   * @param data Optional data to include in the transaction. Use this for contract interactions.
+   * @returns A Promise that resolves to the transaction hash
+   * @throws Will throw an error if the transaction fails to send
+   *
+   * @example
+   * // Sending 0.1 ETH to an address
+   * const txHash = await sendTransaction("0x1234...", "0.1");
+   *
+   * @example
+   * // Interacting with a contract
+   * const data = "0x..."; // Encoded contract method call
+   * const txHash = await sendTransaction("0xContractAddress...", "0", data);
+   */
+  sendTransaction(to: string, value: string, data?: string): Promise<string>;
+
+  /**
+   * Call a specific method on a smart contract
+   * @param contractAddress The Ethereum address of the smart contract
+   * @param abi The ABI (Application Binary Interface) of the contract method
+   * @param method The name of the method to call on the contract
+   * @param params An array of parameters to pass to the contract method
+   * @param value The amount of Ether to send with the transaction, as a string in wei
+   * @returns A Promise that resolves to the transaction hash
+   * @throws Will throw an error if the contract call fails
+   *
+   * @example
+   * // Calling a 'transfer' method on an ERC20 token contract
+   * const txHash = await callContractMethod(
+   *   "0xContractAddress...",
+   *   [{...}], // ABI
+   *   "transfer",
+   *   ["0xRecipient...", "1000000000000000000"], // 1 token with 18 decimals
+   *   "0" // No ETH sent
+   * );
+   *
+   * @example
+   * // Calling a 'mint' method on an ERC721 token contract with 1 ETH
+   * const txHash = await callContractMethod(
+   *  "0xContractAddress...",
+   *  [{...}], // ABI
+   *  "mint",
+   *  ["0xRecipient...", "1"], // Token ID
+   *  "1000000000000000000" // 1 ETH
+   */
+  callContractMethod(
+    contractAddress: string,
+    abi: any,
+    method: string,
+    params?: any[],
+    value?: string,
+  ): Promise<string>;
 
   provider: WalletProvider;
 

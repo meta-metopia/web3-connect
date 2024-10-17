@@ -6,7 +6,8 @@ import {
   createWeb3Modal,
 } from "@web3modal/ethers";
 import { ethers } from "ethers";
-import { ConnectionResponse } from "../../sdk";
+import { callContractMethod } from "../../common/contract.utils";
+import { ConnectionResponse, EIP1193Provider } from "../../sdk";
 import {
   MetaData,
   SignMessageOptions,
@@ -44,8 +45,8 @@ export class WalletConnectProvider implements WalletProvider {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  getProvider() {
-    return this.modal?.getWalletProvider();
+  getProvider(): EIP1193Provider {
+    return this.modal?.getWalletProvider() as any;
   }
 
   async connect(): Promise<ConnectionResponse> {
@@ -194,5 +195,67 @@ export class WalletConnectProvider implements WalletProvider {
     blockExplorerUrl: string,
   ): Promise<void> {
     throw new Error("Method not implemented.");
+  }
+
+  async callContractMethod(
+    contractAddress: string,
+    abi: any,
+    method: string,
+    params?: any[],
+    value?: string,
+  ): Promise<string> {
+    if (this.getProvider() === undefined) {
+      throw new Error("Provider not found");
+    }
+
+    const fromAddress = await this.getWalletAddress();
+    if (!fromAddress) {
+      throw new Error("No wallet address found");
+    }
+
+    return callContractMethod({
+      provider: this.getProvider(),
+      contractAddress,
+      abi,
+      methodName: method,
+      fromAddress,
+      params,
+      value,
+    });
+  }
+
+  async sendTransaction(
+    to: string,
+    value: string,
+    data?: string,
+  ): Promise<string> {
+    const provider = this.modal?.getWalletProvider();
+    if (!provider) {
+      throw new Error("Provider not found");
+    }
+
+    const address = this.modal?.getAddress();
+    if (!address) {
+      throw new Error("Wallet address not found");
+    }
+
+    try {
+      const txHash = await provider.request({
+        method: "eth_sendTransaction",
+        params: [
+          {
+            from: address,
+            to,
+            value: ethers.parseEther(value).toString(16), // Convert to hex
+            data: data || "0x",
+          },
+        ],
+      });
+
+      return txHash;
+    } catch (error) {
+      console.error("Error sending transaction:", error);
+      throw error;
+    }
   }
 }

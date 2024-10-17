@@ -40,6 +40,38 @@ export class Sdk implements SdkInterface {
     return provider;
   }
 
+  getBalance(): Promise<string> {
+    return this.provider.getBalance();
+  }
+
+  getWalletAddress(): Promise<string | undefined> {
+    return this.provider.getWalletAddress();
+  }
+
+  callContractMethod(
+    contractAddress: string,
+    abi: any,
+    method: string,
+    params: any[],
+    value: string,
+  ): Promise<string> {
+    return this.provider.callContractMethod(
+      contractAddress,
+      abi,
+      method,
+      params,
+      value,
+    );
+  }
+
+  async sendTransaction(
+    to: string,
+    value: string,
+    data: string,
+  ): Promise<string> {
+    return this.provider.sendTransaction(to, value, data);
+  }
+
   get walletProviders(): WalletProvider[] {
     return this.providers;
   }
