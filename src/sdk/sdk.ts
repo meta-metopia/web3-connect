@@ -48,6 +48,15 @@ export class Sdk implements SdkInterface {
     return this.provider.getWalletAddress();
   }
 
+  deployContract(
+    abi: any,
+    bytecode: string,
+    params?: any[],
+    value?: string,
+  ): Promise<string> {
+    return this.provider.deployContract(abi, bytecode, params, value);
+  }
+
   callContractMethod(
     contractAddress: string,
     abi: any,

@@ -3,7 +3,7 @@ import { Account } from "@ethereumjs/util";
 import { VM } from "@ethereumjs/vm";
 import { ethers } from "ethers";
 import solc from "solc";
-import { callContractMethod } from "./contract.utils"; // Replace with the actual import path
+import { callContractMethod, deployContract } from "./contract.utils"; // Replace with the actual import path
 
 describe("callContractMethod", () => {
   let vm: VM;
@@ -196,4 +196,155 @@ describe("callContractMethod", () => {
       });
     }),
   );
+});
+
+describe("deployContract", () => {
+  let vm: VM;
+  let fromAddress: string;
+  let contractAddress: string;
+
+  const testCases = [
+    {
+      name: "Contract without constructor parameters",
+      contractSource: `
+        pragma solidity ^0.8.0;
+        
+        contract SimpleStorage {
+          uint256 private value;
+        
+          function setValue(uint256 _value) public {
+            value = _value;
+          }
+        
+          function getValue() public view returns (uint256) {
+            return value;
+          }
+        }
+      `,
+      params: [],
+    },
+    {
+      name: "Contract with constructor parameters",
+      contractSource: `
+        pragma solidity ^0.8.0;
+        
+        contract SimpleStorage {
+          uint256 private value;
+        
+          constructor(uint256 initialValue) {
+            value = initialValue;
+          }
+        
+          function setValue(uint256 _value) public {
+            value = _value;
+          }
+        
+          function getValue() public view returns (uint256) {
+            return value;
+          }
+        }
+      `,
+      params: [42],
+    },
+  ];
+
+  beforeAll(async () => {
+    // Create a random wallet
+    const wallet = ethers.Wallet.createRandom();
+    fromAddress = wallet.address;
+
+    // Set up VM
+    vm = await VM.create();
+
+    // Set up account with balance
+    const account = Account.fromAccountData({ balance: 10n ** 18n });
+    await vm.stateManager.putAccount(Address.fromString(fromAddress), account);
+  });
+
+  const mockProvider = {
+    request: jest.fn(
+      async ({ method, params }: { method: string; params: any[] }) => {
+        if (method === "eth_sendTransaction") {
+          const [txParams] = params;
+          const result = await vm.evm.runCall({
+            to: undefined, // For contract deployment
+            caller: Address.fromString(txParams.from),
+            origin: Address.fromString(txParams.from),
+            data: Buffer.from(txParams.data.slice(2), "hex"),
+            gasLimit: 2000000n,
+            value: txParams.value ? BigInt(txParams.value) : 0n,
+          });
+          contractAddress = result.createdAddress!.toString();
+          return "0x" + result.createdAddress!.toString();
+        } else if (method === "eth_getTransactionReceipt") {
+          return {
+            status: "0x1", // Success
+            transactionHash: params[0],
+            blockNumber: 1,
+            contractAddress: contractAddress,
+          };
+        }
+      },
+    ),
+  };
+
+  testCases.forEach((testCase) => {
+    test(`should deploy ${testCase.name}`, async () => {
+      // Compile the contract
+      const input = {
+        language: "Solidity",
+        sources: {
+          "SimpleStorage.sol": {
+            content: testCase.contractSource,
+          },
+        },
+        settings: {
+          outputSelection: {
+            "*": {
+              "*": ["*"],
+            },
+          },
+        },
+      };
+
+      const output = JSON.parse(solc.compile(JSON.stringify(input)));
+      const contract = output.contracts["SimpleStorage.sol"]["SimpleStorage"];
+      const abi = contract.abi;
+      const bytecode = contract.evm.bytecode.object;
+
+      // Deploy the contract
+      const deployedAddress = await deployContract({
+        provider: mockProvider as any,
+        abi,
+        bytecode,
+        fromAddress,
+        params: testCase.params,
+      });
+
+      // Verify the deployed contract address
+      expect(typeof deployedAddress).toBe("string");
+      expect(deployedAddress).toMatch(/^0x[a-fA-F0-9]{40}$/);
+
+      // Verify that eth_sendTransaction was called
+      expect(mockProvider.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: "eth_sendTransaction",
+          params: expect.arrayContaining([
+            expect.objectContaining({
+              from: fromAddress,
+              data: expect.any(String),
+            }),
+          ]),
+        }),
+      );
+
+      // Verify that eth_getTransactionReceipt was called
+      expect(mockProvider.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: "eth_getTransactionReceipt",
+          params: expect.any(Array),
+        }),
+      );
+    });
+  });
 });

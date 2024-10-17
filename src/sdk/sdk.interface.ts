@@ -164,6 +164,30 @@ export interface SdkInterface {
     value?: string,
   ): Promise<string>;
 
+  /**
+   * Deploy a smart contract
+   * @param abi The ABI (Application Binary Interface) of the contract
+   * @param bytecode The compiled bytecode of the contract
+   * @param params An array of parameters to pass to the contract constructor, if any
+   * @param value The amount of Ether to send with the transaction, as a string in wei, if any
+   *
+   * @returns A contract address
+   *
+   * @example
+   * // Deploying a contract with no constructor parameters
+   * const contractAddress = await deployContract(
+   *  [{...}], // ABI
+   *  "0x...", // Bytecode
+   *  [] // No constructor parameters
+   *  );
+   */
+  deployContract(
+    abi: any,
+    bytecode: string,
+    params?: any[],
+    value?: string,
+  ): Promise<string>;
+
   provider: WalletProvider;
 
   walletProviders: WalletProvider[];
