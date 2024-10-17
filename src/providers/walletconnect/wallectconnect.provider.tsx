@@ -6,7 +6,10 @@ import {
   createWeb3Modal,
 } from "@web3modal/ethers";
 import { ethers } from "ethers";
-import { callContractMethod } from "../../common/contract.utils";
+import {
+  callContractMethod,
+  deployContract,
+} from "../../common/contract.utils";
 import { ConnectionResponse, EIP1193Provider } from "../../sdk";
 import {
   MetaData,
@@ -218,6 +221,31 @@ export class WalletConnectProvider implements WalletProvider {
       contractAddress,
       abi,
       methodName: method,
+      fromAddress,
+      params,
+      value,
+    });
+  }
+
+  async deployContract(
+    abi: any,
+    bytecode: string,
+    params?: any[],
+    value?: string,
+  ): Promise<string> {
+    if (this.getProvider() === undefined) {
+      throw new Error("Provider not found");
+    }
+
+    const fromAddress = await this.getWalletAddress();
+    if (!fromAddress) {
+      throw new Error("No wallet address found");
+    }
+
+    return deployContract({
+      provider: this.getProvider(),
+      abi,
+      bytecode,
       fromAddress,
       params,
       value,

@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { callContractMethod } from "../common/contract.utils";
+import { callContractMethod, deployContract } from "../common/contract.utils";
 import { ConnectionResponse } from "../sdk";
 import {
   EIP1193Provider,
@@ -208,6 +208,30 @@ export class BaseProvider implements WalletProvider {
       console.error("Error sending transaction:", error);
       throw new Error("Failed to send transaction");
     }
+  }
+
+  async deployContract(
+    abi: any[],
+    bytecode: string,
+    params: any[] = [],
+    value = "0",
+  ): Promise<string> {
+    if (this.provider === undefined) {
+      throw new Error("Provider not found");
+    }
+
+    const fromAddress = await this.getWalletAddress();
+    if (!fromAddress) {
+      throw new Error("No wallet address found");
+    }
+    return deployContract({
+      provider: this.provider,
+      abi,
+      bytecode,
+      fromAddress,
+      params,
+      value,
+    });
   }
 
   async callContractMethod(

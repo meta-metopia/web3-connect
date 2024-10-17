@@ -136,6 +136,13 @@ export interface WalletProvider {
     value?: string,
   ): Promise<string>;
 
+  deployContract(
+    abi: any,
+    bytecode: string,
+    params?: any[],
+    value?: string,
+  ): Promise<string>;
+
   /**
    * Listen to account changes. If account is undefined, the user has signed out
    */
