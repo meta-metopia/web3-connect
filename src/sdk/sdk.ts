@@ -3,8 +3,11 @@ import { SessionResponse } from "../common";
 import { AvailableProvider } from "../common";
 import { WalletProvider } from "../providers";
 import {
+  CallContractMethodOptions,
   ConnectionResponse,
+  DeployContractOptions,
   SdkInterface,
+  SendTransactionOptions,
   SignInOptions,
   SupportedChain,
   SwitchToNetworkOptions,
@@ -52,37 +55,16 @@ export class Sdk implements SdkInterface {
     return this.provider?.getWalletAddress(...chains);
   }
 
-  deployContract(
-    abi: any,
-    bytecode: string,
-    params?: any[],
-    value?: string,
-  ): Promise<string> {
-    return this.provider.deployContract(abi, bytecode, params, value);
+  deployContract(opts: DeployContractOptions): Promise<string> {
+    return this.provider.deployContract(opts);
   }
 
-  callContractMethod(
-    contractAddress: string,
-    abi: any,
-    method: string,
-    params: any[],
-    value: string,
-  ): Promise<string> {
-    return this.provider.callContractMethod(
-      contractAddress,
-      abi,
-      method,
-      params,
-      value,
-    );
+  callContractMethod(opts: CallContractMethodOptions): Promise<string> {
+    return this.provider.callContractMethod(opts);
   }
 
-  async sendTransaction(
-    to: string,
-    value: string,
-    data: string,
-  ): Promise<string> {
-    return this.provider.sendTransaction(to, value, data);
+  async sendTransaction(opts: SendTransactionOptions): Promise<string> {
+    return this.provider.sendTransaction(opts);
   }
 
   get walletProviders(): WalletProvider[] {

@@ -158,7 +158,11 @@ describe("BaseProvider", () => {
     const value = "1000000000000000000"; // 1 ETH in wei
     const data = "0x";
 
-    const txHash = await walletProvider.sendTransaction(to, value, data);
+    const txHash = await walletProvider.sendTransaction({
+      to,
+      value,
+      data,
+    });
 
     expect(txHash).toBeDefined();
     expect(txHash).toMatch(/^0x[a-fA-F0-9]{64}$/);
@@ -168,11 +172,11 @@ describe("BaseProvider", () => {
     const walletProviderWithoutProvider = new BaseProvider({} as any);
 
     await expect(
-      walletProviderWithoutProvider.sendTransaction(
-        "0x1234567890123456789012345678901234567890",
-        "1000000000000000000",
-        "0x",
-      ),
+      walletProviderWithoutProvider.sendTransaction({
+        to: "0x1234567890123456789012345678901234567890",
+        value: "1000000000000000000",
+        data: "0x",
+      }),
     ).rejects.toThrow("Provider not found");
   });
 
@@ -180,13 +184,13 @@ describe("BaseProvider", () => {
     const walletProviderWithoutProvider = new BaseProvider({} as any);
 
     await expect(
-      walletProviderWithoutProvider.callContractMethod(
-        "0x1234567890123456789012345678901234567890",
-        [],
-        "someMethod",
-        [],
-        "0",
-      ),
+      walletProviderWithoutProvider.callContractMethod({
+        contractAddress: "0x1234567890123456789012345678901234567890",
+        abi: [],
+        method: "someMethod",
+        params: [],
+        value: "0",
+      }),
     ).rejects.toThrow("Provider not found");
   });
 });

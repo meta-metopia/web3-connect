@@ -10,7 +10,14 @@ import {
   callContractMethod,
   deployContract,
 } from "../../common/contract.utils";
-import { ConnectionResponse, EIP1193Provider, SupportedChain } from "../../sdk";
+import {
+  CallContractMethodOptions,
+  ConnectionResponse,
+  DeployContractOptions,
+  EIP1193Provider,
+  SendTransactionOptions,
+  SupportedChain,
+} from "../../sdk";
 import {
   MetaData,
   SignMessageOptions,
@@ -205,13 +212,13 @@ export class WalletConnectProvider implements WalletProvider {
     throw new Error("Method not implemented.");
   }
 
-  async callContractMethod(
-    contractAddress: string,
-    abi: any,
-    method: string,
-    params?: any[],
-    value?: string,
-  ): Promise<string> {
+  async callContractMethod({
+    contractAddress,
+    abi,
+    method,
+    params = [],
+    value,
+  }: CallContractMethodOptions): Promise<string> {
     if (this.getProvider() === undefined) {
       throw new Error("Provider not found");
     }
@@ -232,12 +239,12 @@ export class WalletConnectProvider implements WalletProvider {
     });
   }
 
-  async deployContract(
-    abi: any,
-    bytecode: string,
-    params?: any[],
-    value?: string,
-  ): Promise<string> {
+  async deployContract({
+    abi,
+    bytecode,
+    params = [],
+    value = "0",
+  }: DeployContractOptions): Promise<string> {
     if (this.getProvider() === undefined) {
       throw new Error("Provider not found");
     }
@@ -257,11 +264,11 @@ export class WalletConnectProvider implements WalletProvider {
     });
   }
 
-  async sendTransaction(
-    to: string,
-    value: string,
-    data?: string,
-  ): Promise<string> {
+  async sendTransaction({
+    to,
+    value,
+    data,
+  }: SendTransactionOptions): Promise<string> {
     const provider = this.modal?.getWalletProvider();
     if (!provider) {
       throw new Error("Provider not found");

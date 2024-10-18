@@ -43,6 +43,126 @@ export interface SignInOptions {
   callbacks?: SignInCallbacks;
 }
 
+export interface SendTransactionOptions {
+  /**
+   * Recipient address
+   */
+  to: string;
+  /**
+   * Value in wei to send with the transaction
+   */
+  value: string;
+  /**
+   * Data to send with the transaction
+   */
+  data?: string;
+  /**
+   * Optional field to specify `send transaction` on a non-default blockchain.
+   * If not specified, "ethereum" is used as the default. Note, not all providers support this field.
+   *
+   * For EVM and EVM-compatible chains:
+   * - Use "ethereum" as the value.
+   * - Use `switchToNetwork` to specify other Ethereum-based chains.
+   *
+   * This field is specifically for non-EVM chains (e.g., Solana).
+   *
+   * @example
+   * // For Solana deployment
+   * chain: "solana"
+   *
+   * // For any Ethereum-based chain (default if omitted)
+   * chain: "ethereum"
+   * // Then use switchToNetwork to specify the exact chain
+   *
+   * @default "ethereum"
+   */
+  chain?: SupportedChain;
+}
+
+export interface CallContractMethodOptions {
+  /**
+   * Contract address
+   */
+  contractAddress: string;
+  /**
+   * ABI of the contract
+   */
+  abi: any;
+  /**
+   * Method to call
+   */
+  method: string;
+  /**
+   * Parameters for the method. Can be empty if the method does not require any parameters.
+   */
+  params?: any[];
+  /**
+   * Number of wei to send with the transaction
+   */
+  value?: string;
+  /**
+   * Optional field to specify `call contract action` on a non-default blockchain.
+   * If not specified, "ethereum" is used as the default.
+   *
+   * For EVM and EVM-compatible chains:
+   * - Use "ethereum" as the value.
+   * - Use `switchToNetwork` to specify other Ethereum-based chains.
+   *
+   * This field is specifically for non-EVM chains (e.g., Solana).
+   *
+   * @example
+   * // For Solana deployment
+   * chain: "solana"
+   *
+   * // For any Ethereum-based chain (default if omitted)
+   * chain: "ethereum"
+   * // Then use switchToNetwork to specify the exact chain
+   *
+   * @default "ethereum"
+   */
+  chain?: SupportedChain;
+}
+
+export interface DeployContractOptions {
+  /**
+   * ABI of the contract
+   */
+  abi: any;
+  /**
+   * Bytecode of the contract
+   */
+  bytecode: string;
+  /**
+   * Parameters for the constructor. Can be empty if the constructor does not require any parameters.
+   */
+  params?: any[];
+  /**
+   * Number of wei to send with the transaction
+   */
+  value?: string;
+  /**
+   * Optional field to specify deployment on a non-default blockchain.
+   * If not specified, "ethereum" is used as the default.
+   *
+   * For EVM and EVM-compatible chains:
+   * - Use "ethereum" as the value.
+   * - Use `switchToNetwork` to specify other Ethereum-based chains.
+   *
+   * This field is specifically for non-EVM chains (e.g., Solana).
+   *
+   * @example
+   * // For Solana deployment
+   * chain: "solana"
+   *
+   * // For any Ethereum-based chain (default if omitted)
+   * chain: "ethereum"
+   * // Then use switchToNetwork to specify the exact chain
+   *
+   * @default "ethereum"
+   */
+  chain?: SupportedChain;
+}
+
 /**
  * The supported chains
  * - `ethereum`: Ethereum or EVM compatible chains
@@ -113,83 +233,52 @@ export interface SdkInterface {
 
   /**
    * Send a transaction on the blockchain
-   * @param to The recipient's Ethereum address
-   * @param value The amount of Ether to send, as a string (e.g., "0.1" for 0.1 ETH)
-   * @param data Optional data to include in the transaction. Use this for contract interactions.
+   * @param opts The transaction options
    * @returns A Promise that resolves to the transaction hash
    * @throws Will throw an error if the transaction fails to send
    *
    * @example
    * // Sending 0.1 ETH to an address
-   * const txHash = await sendTransaction("0x1234...", "0.1");
+   * const txHash = await sendTransaction({
+   *  to: "0xRecipient...",
+   *  value: "100000000000000000", // 0.1 ETH in wei
+   *  });
    *
-   * @example
-   * // Interacting with a contract
-   * const data = "0x..."; // Encoded contract method call
-   * const txHash = await sendTransaction("0xContractAddress...", "0", data);
    */
-  sendTransaction(to: string, value: string, data?: string): Promise<string>;
+  sendTransaction(opts: SendTransactionOptions): Promise<string>;
 
   /**
    * Call a specific method on a smart contract
-   * @param contractAddress The Ethereum address of the smart contract
-   * @param abi The ABI (Application Binary Interface) of the contract method
-   * @param method The name of the method to call on the contract
-   * @param params An array of parameters to pass to the contract method
-   * @param value The amount of Ether to send with the transaction, as a string in wei
+   * @param opts The contract method options
    * @returns A Promise that resolves to the transaction hash
    * @throws Will throw an error if the contract call fails
    *
    * @example
    * // Calling a 'transfer' method on an ERC20 token contract
-   * const txHash = await callContractMethod(
-   *   "0xContractAddress...",
-   *   [{...}], // ABI
-   *   "transfer",
-   *   ["0xRecipient...", "1000000000000000000"], // 1 token with 18 decimals
-   *   "0" // No ETH sent
-   * );
-   *
-   * @example
-   * // Calling a 'mint' method on an ERC721 token contract with 1 ETH
-   * const txHash = await callContractMethod(
-   *  "0xContractAddress...",
-   *  [{...}], // ABI
-   *  "mint",
-   *  ["0xRecipient...", "1"], // Token ID
-   *  "1000000000000000000" // 1 ETH
+   * const txHash = await callContractMethod({
+   *     contractAddress: "0xToken...",
+   *     abi: [...], // ABI of the ERC20 token contract
+   *     method: "transfer",
+   *     params: ["0xRecipient...", "1000000000000000000"], // Recipient address and amount in wei
+   * });
    */
-  callContractMethod(
-    contractAddress: string,
-    abi: any,
-    method: string,
-    params?: any[],
-    value?: string,
-  ): Promise<string>;
+  callContractMethod(opts: CallContractMethodOptions): Promise<any>;
 
   /**
    * Deploy a smart contract
-   * @param abi The ABI (Application Binary Interface) of the contract
-   * @param bytecode The compiled bytecode of the contract
-   * @param params An array of parameters to pass to the contract constructor, if any
-   * @param value The amount of Ether to send with the transaction, as a string in wei, if any
-   *
+   * @param opts The contract deployment options
    * @returns A contract address
    *
    * @example
    * // Deploying a contract with no constructor parameters
-   * const contractAddress = await deployContract(
-   *  [{...}], // ABI
-   *  "0x...", // Bytecode
-   *  [] // No constructor parameters
-   *  );
+   * const contractAddress = await deployContract({
+   *     abi: [...], // ABI of the contract
+   *     bytecode: "0x...", // Bytecode of the contract
+   *     params: [], // No constructor parameters
+   *     value: "1000000000000000000", // Value in wei
+   *  });
    */
-  deployContract(
-    abi: any,
-    bytecode: string,
-    params?: any[],
-    value?: string,
-  ): Promise<string>;
+  deployContract(opts: DeployContractOptions): Promise<string>;
 
   provider: WalletProvider;
 

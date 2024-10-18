@@ -31,7 +31,6 @@ export function WalletConnect() {
     await signIn(providerName, {
       onSignedIn: async (walletAddress, provider, session) => {
         sessionStorage.setItem("session", JSON.stringify(session));
-        // window.location.reload();
         router.refresh();
       },
       getSignInData: async () => {},
