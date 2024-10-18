@@ -175,7 +175,6 @@ export class Sdk implements SdkInterface {
       throw new Error("No provider founded");
     }
     await this.provider.disconnect();
-    localStorage.clear();
   }
 
   onAccountsChanged(callback: (account: string | undefined) => void): void {
