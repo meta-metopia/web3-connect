@@ -63,7 +63,7 @@ describe("BaseProvider", () => {
   });
 
   it("should return the wallet address", async () => {
-    const address = await walletProvider.getWalletAddress();
+    const [address] = await walletProvider.getWalletAddress();
     expect(address).toBe(wallet.address);
   });
 

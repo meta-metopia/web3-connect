@@ -43,7 +43,12 @@ export interface SignInOptions {
   callbacks?: SignInCallbacks;
 }
 
-export type SupportedChain = "evm" | "solana";
+/**
+ * The supported chains
+ * - `ethereum`: Ethereum or EVM compatible chains
+ * - `solana`: Solana
+ */
+export type SupportedChain = "ethereum" | "solana";
 
 export interface SdkInterface {
   /**
@@ -82,16 +87,14 @@ export interface SdkInterface {
    *
    * @example
    * // Get the wallet address for Ethereum
-   * const ethAddress = await getWalletAddress("evm"); // "0x1234..."
+   * const ethAddress = await getWalletAddress("ethereum"); // "0x1234..."
    *
    * @example
    * // Get the wallet address for multiple chains
-   * const [ethAddress, solAddress] = await getWalletAddress("evm", "solana");
+   * const [ethAddress, solAddress] = await getWalletAddress("ethereum", "solana");
    *
    */
-  getWalletAddress(
-    ...args: SupportedChain[]
-  ): Promise<string | string[] | undefined>;
+  getWalletAddress(...args: SupportedChain[]): Promise<string[]>;
 
   /**
    * get balance of the wallet address for the supported chains

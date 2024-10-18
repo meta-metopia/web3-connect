@@ -1,5 +1,5 @@
-import { AvailableProvider } from "../common/availableProviders";
-import { ConnectionResponse } from "../sdk/sdk.interface";
+import { AvailableProvider } from "../common";
+import { ConnectionResponse, SupportedChain } from "../sdk";
 
 export interface SignMessageOptions {
   /**
@@ -62,7 +62,7 @@ export interface WalletProvider {
    * Get the current wallet address, if available
    * @returns wallet address, or undefined if not available
    */
-  getWalletAddress(): Promise<string | undefined>;
+  getWalletAddress(...chains: SupportedChain[]): Promise<string[]>;
 
   /**
    * Check wheter the given provider is enabled. Otherwise, no installed text will be shown

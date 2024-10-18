@@ -1,3 +1,4 @@
+import { SupportedChain } from "../../sdk";
 import { BaseProvider } from "../base.provider";
 import { EIP6963AnnounceProviderEvent, MetaData } from "../provider.interface";
 import { OKXWalletIcon } from "./okx.icon";
@@ -35,5 +36,30 @@ export class OKXProvider extends BaseProvider {
       },
     );
     this.globalWindow.dispatchEvent(new Event("eip6963:requestProvider"));
+  }
+
+  async getWalletAddress(...chains: SupportedChain[]): Promise<string[]> {
+    if (this.provider === undefined) {
+      throw new Error("Provider not found");
+    }
+    if (chains.length === 0) return super.getWalletAddress();
+
+    const hasEth = chains.includes("ethereum");
+    const hasSol = chains.includes("solana");
+
+    const addresses: string[] = [];
+    if (hasEth) {
+      const ethAddress = await this.provider.request({
+        method: "eth_requestAccounts",
+      });
+      addresses.push(ethAddress[0]);
+    }
+
+    if (hasSol) {
+      const solanaWallet = await this.globalWindow.okxwallet.solana;
+      const address = await solanaWallet.connect();
+      addresses.push(address.publicKey.toString());
+    }
+    return addresses;
   }
 }

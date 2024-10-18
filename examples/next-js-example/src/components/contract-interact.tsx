@@ -87,7 +87,7 @@ export function ContractInteract() {
   }, [sdk, walletAddress, sdk.provider, contractAddress]);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-2xl font-bold justify-between flex flex-row">
           <span>Interact with Contract</span>

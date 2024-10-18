@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { EnvironmentProvider, WalletContextProvider } from "web3-connect-react";
+import { WalletContextProvider } from "web3-connect-react";
 import { MetaMaskProvider, OKXProvider } from "web3-connect-react/providers";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -9,16 +9,14 @@ export function Providers({ children }: { children: ReactNode }) {
   const parsedSession = session ? JSON.parse(session) : { isAuth: false };
 
   return (
-    <EnvironmentProvider isMobile={false}>
-      <WalletContextProvider
-        onSignedOut={async () => {
-          sessionStorage.removeItem("session");
-        }}
-        session={parsedSession}
-        providers={[MetaMaskProvider, OKXProvider]}
-      >
-        {children}
-      </WalletContextProvider>
-    </EnvironmentProvider>
+    <WalletContextProvider
+      onSignedOut={async () => {
+        sessionStorage.removeItem("session");
+      }}
+      session={parsedSession}
+      providers={[MetaMaskProvider, OKXProvider]}
+    >
+      {children}
+    </WalletContextProvider>
   );
 }

@@ -62,7 +62,7 @@ describe("MetamaskMockProvider", () => {
   });
 
   it("should be able to get address", async () => {
-    const address = await provider.getWalletAddress();
+    const [address] = await provider.getWalletAddress();
     expect(address).toEqual(wallet.address);
   });
 
