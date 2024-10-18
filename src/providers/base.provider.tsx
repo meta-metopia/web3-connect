@@ -1,6 +1,12 @@
 import { ethers } from "ethers";
 import { callContractMethod, deployContract } from "../common/contract.utils";
-import { ConnectionResponse, SupportedChain } from "../sdk";
+import {
+  CallContractMethodOptions,
+  ConnectionResponse,
+  DeployContractOptions,
+  SendTransactionOptions,
+  SupportedChain,
+} from "../sdk";
 import {
   EIP1193Provider,
   MetaData,
@@ -179,11 +185,11 @@ export class BaseProvider implements WalletProvider {
     });
   }
 
-  async sendTransaction(
-    to: string,
-    value: string,
-    data?: string,
-  ): Promise<string> {
+  async sendTransaction({
+    to,
+    data,
+    value,
+  }: SendTransactionOptions): Promise<string> {
     if (this.provider === undefined) {
       throw new Error("Provider not found");
     }
@@ -213,12 +219,12 @@ export class BaseProvider implements WalletProvider {
     }
   }
 
-  async deployContract(
-    abi: any[],
-    bytecode: string,
-    params: any[] = [],
+  async deployContract({
+    abi,
+    bytecode,
+    params = [],
     value = "0",
-  ): Promise<string> {
+  }: DeployContractOptions): Promise<string> {
     if (this.provider === undefined) {
       throw new Error("Provider not found");
     }
@@ -237,13 +243,13 @@ export class BaseProvider implements WalletProvider {
     });
   }
 
-  async callContractMethod(
-    contractAddress: string,
-    abi: any[],
-    methodName: string,
-    params: any[],
+  async callContractMethod({
+    contractAddress,
+    abi,
+    method,
+    params = [],
     value = "0",
-  ): Promise<string> {
+  }: CallContractMethodOptions): Promise<string> {
     if (this.provider === undefined) {
       throw new Error("Provider not found");
     }
@@ -257,7 +263,7 @@ export class BaseProvider implements WalletProvider {
       provider: this.provider,
       contractAddress,
       abi,
-      methodName,
+      methodName: method,
       fromAddress,
       params,
       value,

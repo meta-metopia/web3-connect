@@ -62,6 +62,56 @@ export class MetaMaskProvider extends BaseProvider {
 }
 ```
 
+## Use the sdk
+
+### Sign In
+```tsx
+import { useWallet } from "web3-connect-react";
+
+const { signIn, isSignedIn } = useWallet();
+
+await signIn(providerName, {
+    onSignedIn: async (walletAddress, provider, session) => {
+        sessionStorage.setItem("session", JSON.stringify(session));
+        router.refresh();
+    },
+    getSignInData: async () => {},
+});
+```
+
+### Sign Out
+```tsx
+import { useWallet } from "web3-connect-react";
+
+const { signOut } = useWallet();
+
+await signOut();
+```
+
+### Call a Contract
+```tsx
+import { useWallet } from "web3-connect-react";
+
+const { sdk } = useWallet();
+
+// deploy
+const address = await sdk
+    .deployContract({
+        abi,
+        bytecode,
+    });
+
+// call
+const result = await sdk.callContractMethod({
+    contractAddress,
+    abi,
+    method: "balanceOf",
+    params: [walletAddress],
+})
+```
+
+
+
 ## Testing
 
 ```bash

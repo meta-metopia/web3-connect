@@ -24,7 +24,10 @@ export function ContractInteract() {
     try {
       setIsDeploying(true);
       const address = await sdk
-        .deployContract(abi, bytecode)
+        .deployContract({
+          abi,
+          bytecode,
+        })
         .finally(() => setIsDeploying(false));
       sessionStorage.setItem("contractAddress", address);
       setContractAddress(address);
@@ -45,12 +48,12 @@ export function ContractInteract() {
     }
     try {
       setIsRefreshing(true);
-      const result = await sdk.callContractMethod(
+      const result = await sdk.callContractMethod({
         contractAddress,
         abi,
-        "balanceOf",
-        [walletAddress],
-      );
+        method: "balanceOf",
+        params: [walletAddress],
+      });
       setCurrentBalance(result);
     } catch (error: any) {
       console.error(error);
@@ -66,10 +69,12 @@ export function ContractInteract() {
     }
     try {
       setIsMinting(true);
-      await sdk.callContractMethod(contractAddress, abi, "mint", [
-        walletAddress,
-        value,
-      ]);
+      await sdk.callContractMethod({
+        contractAddress,
+        abi,
+        method: "mint",
+        params: [walletAddress, value],
+      });
       await getBalance();
     } catch (error: any) {
       console.error(error);
