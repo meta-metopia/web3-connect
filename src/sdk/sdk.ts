@@ -1,11 +1,12 @@
 import { ethers } from "ethers";
 import { SessionResponse } from "../common";
-import { AvailableProvider } from "../common/availableProviders";
+import { AvailableProvider } from "../common";
 import { WalletProvider } from "../providers";
 import {
   ConnectionResponse,
   SdkInterface,
   SignInOptions,
+  SupportedChain,
   SwitchToNetworkOptions,
 } from "./sdk.interface";
 
@@ -44,8 +45,8 @@ export class Sdk implements SdkInterface {
     return this.provider.getBalance();
   }
 
-  getWalletAddress(): Promise<string | undefined> {
-    return this.provider.getWalletAddress();
+  getWalletAddress(...chains: SupportedChain[]): Promise<string[] | undefined> {
+    return this.provider.getWalletAddress(...chains);
   }
 
   deployContract(
@@ -113,7 +114,7 @@ export class Sdk implements SdkInterface {
       return false;
     }
 
-    const walletAddress = await provider.getWalletAddress();
+    const [walletAddress] = await provider.getWalletAddress();
     try {
       return (
         serverSession.isAuth &&

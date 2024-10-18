@@ -10,7 +10,7 @@ import {
   callContractMethod,
   deployContract,
 } from "../../common/contract.utils";
-import { ConnectionResponse, EIP1193Provider } from "../../sdk";
+import { ConnectionResponse, EIP1193Provider, SupportedChain } from "../../sdk";
 import {
   MetaData,
   SignMessageOptions,
@@ -35,9 +35,14 @@ export class WalletConnectProvider implements WalletProvider {
     }
   }
 
-  async getWalletAddress(): Promise<string | undefined> {
+  async getWalletAddress(
+    ...chains: SupportedChain[]
+  ): Promise<string[] | undefined> {
+    if (chains.length !== 0) {
+      throw new Error("Chain specific wallet address not supported");
+    }
     if (!this.modal?.getWalletProvider()) await this.sleep(1000);
-    return this.modal?.getAddress();
+    return [this.modal?.getAddress()];
   }
 
   isEnabled(): boolean {
@@ -211,7 +216,7 @@ export class WalletConnectProvider implements WalletProvider {
       throw new Error("Provider not found");
     }
 
-    const fromAddress = await this.getWalletAddress();
+    const [fromAddress] = await this.getWalletAddress();
     if (!fromAddress) {
       throw new Error("No wallet address found");
     }
@@ -237,7 +242,7 @@ export class WalletConnectProvider implements WalletProvider {
       throw new Error("Provider not found");
     }
 
-    const fromAddress = await this.getWalletAddress();
+    const [fromAddress] = await this.getWalletAddress();
     if (!fromAddress) {
       throw new Error("No wallet address found");
     }

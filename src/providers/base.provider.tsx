@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { callContractMethod, deployContract } from "../common/contract.utils";
-import { ConnectionResponse } from "../sdk";
+import { ConnectionResponse, SupportedChain } from "../sdk";
 import {
   EIP1193Provider,
   MetaData,
@@ -138,17 +138,20 @@ export class BaseProvider implements WalletProvider {
     });
   }
 
-  async getWalletAddress(): Promise<string | undefined> {
+  async getWalletAddress(...chains: SupportedChain[]): Promise<string[]> {
     if (this.provider === undefined) {
       return undefined;
     }
 
-    // check if wallet is connected
-    const accounts = await this.provider.request({ method: "eth_accounts" });
-    if (accounts.length === 0) {
-      return undefined;
+    if (chains.length === 0 || chains[0] === "ethereum") {
+      // check if wallet is connected
+      const accounts = await this.provider.request({ method: "eth_accounts" });
+      if (accounts.length === 0) {
+        return undefined;
+      }
+      return [ethers.getAddress(accounts[0])];
     }
-    return ethers.getAddress(accounts[0]);
+    throw new Error("Chain not supported");
   }
 
   /**
@@ -220,7 +223,7 @@ export class BaseProvider implements WalletProvider {
       throw new Error("Provider not found");
     }
 
-    const fromAddress = await this.getWalletAddress();
+    const [fromAddress] = await this.getWalletAddress();
     if (!fromAddress) {
       throw new Error("No wallet address found");
     }
@@ -245,7 +248,7 @@ export class BaseProvider implements WalletProvider {
       throw new Error("Provider not found");
     }
 
-    const fromAddress = await this.getWalletAddress();
+    const [fromAddress] = await this.getWalletAddress();
     if (!fromAddress) {
       throw new Error("No wallet address found");
     }
