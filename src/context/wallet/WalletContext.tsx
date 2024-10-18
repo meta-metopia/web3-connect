@@ -201,6 +201,8 @@ function WalletContextProvider({
     }
     await sdk.signOut();
     await onSignedOut();
+    // update the state
+    setIsSignedIn(false);
   }, [sdk]);
 
   const switchNetwork = useCallback(

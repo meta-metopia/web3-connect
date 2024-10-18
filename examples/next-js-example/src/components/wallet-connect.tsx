@@ -9,11 +9,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LogOut, Wallet } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AvailableProvider, useWallet } from "web3-connect-react";
 
 export function WalletConnect() {
   const { sdk, signIn, signOut, isSignedIn } = useWallet();
+  const router = useRouter();
   const [addresses, setAddresses] = useState<
     {
       address: string;
@@ -23,33 +25,40 @@ export function WalletConnect() {
 
   const handleSignOut = async () => {
     await signOut();
-    window.location.reload();
   };
 
   const handleSignIn = async (providerName: AvailableProvider) => {
     await signIn(providerName, {
       onSignedIn: async (walletAddress, provider, session) => {
         sessionStorage.setItem("session", JSON.stringify(session));
-        window.location.reload();
+        // window.location.reload();
+        router.refresh();
       },
       getSignInData: async () => {},
     });
   };
 
   useEffect(() => {
-    if (!isSignedIn || !sdk) return;
-    sdk.getWalletAddress("ethereum", "solana").then((addresses) => {
-      setAddresses([
-        {
-          address: addresses[0],
-          chain: "ethereum",
-        },
-        {
-          address: addresses[1],
-          chain: "solana",
-        },
-      ]);
-    });
+    if (!isSignedIn) {
+      setAddresses([]);
+    }
+    if (!sdk) return;
+    if (!sdk.provider) return;
+    sdk
+      .getWalletAddress("ethereum", "solana")
+      .then((addresses) => {
+        setAddresses([
+          {
+            address: addresses[0],
+            chain: "ethereum",
+          },
+          {
+            address: addresses[1],
+            chain: "solana",
+          },
+        ]);
+      })
+      .catch(console.error);
   }, [sdk, isSignedIn]);
 
   return (

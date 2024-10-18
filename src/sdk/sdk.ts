@@ -11,10 +11,13 @@ import {
 } from "./sdk.interface";
 
 export class Sdk implements SdkInterface {
+  private session: SessionResponse | undefined;
   constructor(
     private readonly providers: WalletProvider[],
-    private readonly session: SessionResponse | undefined,
-  ) {}
+    session: SessionResponse | undefined,
+  ) {
+    this.session = session;
+  }
 
   registerProvider(provider: WalletProvider) {
     const foundIndex = this.providers.findIndex(
@@ -46,7 +49,7 @@ export class Sdk implements SdkInterface {
   }
 
   getWalletAddress(...chains: SupportedChain[]): Promise<string[] | undefined> {
-    return this.provider.getWalletAddress(...chains);
+    return this.provider?.getWalletAddress(...chains);
   }
 
   deployContract(
@@ -165,6 +168,8 @@ export class Sdk implements SdkInterface {
       session,
     );
 
+    this.session = session;
+
     return {
       action,
       walletAddress,
@@ -176,6 +181,7 @@ export class Sdk implements SdkInterface {
       throw new Error("No provider founded");
     }
     await this.provider.disconnect();
+    this.session = undefined;
   }
 
   onAccountsChanged(callback: (account: string | undefined) => void): void {
