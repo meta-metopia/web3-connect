@@ -10,6 +10,7 @@ import {
 import {
   EIP1193Provider,
   MetaData,
+  SignMessageOptions,
   WalletProvider,
 } from "./provider.interface";
 
@@ -53,14 +54,15 @@ export class BaseProvider implements WalletProvider {
     return `0x${value.toString(16)}`;
   }
 
-  async signMessage(
-    obj: any,
-    p0: { forAuthentication: boolean },
-  ): Promise<string> {
+  async signMessage(obj: any, opts: SignMessageOptions): Promise<string> {
     let strMessage = "";
 
     if (this.provider === undefined) {
       throw new Error("Provider not found");
+    }
+
+    if (opts.chain && opts.chain !== "ethereum") {
+      throw new Error(`${opts.chain} is not supported by this provider`);
     }
 
     if (typeof obj === "string") {
@@ -189,9 +191,14 @@ export class BaseProvider implements WalletProvider {
     to,
     data,
     value,
+    chain,
   }: SendTransactionOptions): Promise<string> {
     if (this.provider === undefined) {
       throw new Error("Provider not found");
+    }
+
+    if (chain && chain !== "ethereum") {
+      throw new Error(`${chain} is not supported by this provider`);
     }
 
     const from = await this.getWalletAddress();
@@ -224,9 +231,14 @@ export class BaseProvider implements WalletProvider {
     bytecode,
     params = [],
     value = "0",
+    chain,
   }: DeployContractOptions): Promise<string> {
     if (this.provider === undefined) {
       throw new Error("Provider not found");
+    }
+
+    if (chain && chain !== "ethereum") {
+      throw new Error(`${chain} is not supported by this provider`);
     }
 
     const [fromAddress] = await this.getWalletAddress();
@@ -249,9 +261,14 @@ export class BaseProvider implements WalletProvider {
     method,
     params = [],
     value = "0",
+    chain,
   }: CallContractMethodOptions): Promise<string> {
     if (this.provider === undefined) {
       throw new Error("Provider not found");
+    }
+
+    if (chain && chain !== "ethereum") {
+      throw new Error(`${chain} is not supported by this provider`);
     }
 
     const [fromAddress] = await this.getWalletAddress();

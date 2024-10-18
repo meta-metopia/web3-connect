@@ -51,8 +51,10 @@ export class Sdk implements SdkInterface {
     return this.provider.getBalance();
   }
 
-  getWalletAddress(...chains: SupportedChain[]): Promise<string[] | undefined> {
-    return this.provider?.getWalletAddress(...chains);
+  async getWalletAddress(
+    ...chains: SupportedChain[]
+  ): Promise<string[] | undefined> {
+    return await this.provider?.getWalletAddress(...chains);
   }
 
   deployContract(opts: DeployContractOptions): Promise<string> {

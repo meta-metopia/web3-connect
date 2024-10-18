@@ -12,6 +12,8 @@ export interface SignMessageOptions {
    * Whether the message is for authentication
    */
   forAuthentication?: boolean;
+
+  chain?: SupportedChain;
 }
 
 export interface ClaimParams {
@@ -151,6 +153,7 @@ export interface WalletProvider {
    * Sign a message
    * @param message The message to sign. Can be a string or an object
    *
+   * @param opts
    */
   signMessage(message: any, opts: SignMessageOptions): Promise<string>;
 
