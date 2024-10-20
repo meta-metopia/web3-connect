@@ -81,12 +81,12 @@ export class BaseProvider implements WalletProvider {
     }
 
     // sign the message
+    const [fromAddress] = await this.getWalletAddress();
     const messageToBeSigned = `0x${Buffer.from(strMessage, "utf8").toString("hex")}`;
-    const signature = await this.provider.request({
+    return await this.provider.request({
       method: "personal_sign",
-      params: [messageToBeSigned, await this.getWalletAddress()],
+      params: [messageToBeSigned, fromAddress],
     });
-    return signature;
   }
 
   /**

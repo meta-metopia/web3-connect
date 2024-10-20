@@ -24,7 +24,7 @@ export default function Home() {
               className="mt-8"
             >
               <Tabs
-                defaultValue="smart-contract"
+                defaultValue={"smart-contract"}
                 className="bg-white border rounded-xl overflow-hidden"
               >
                 <TabsList className="m-5">

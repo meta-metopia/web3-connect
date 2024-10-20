@@ -1,5 +1,6 @@
 "use client";
 
+import SupportedChainsSelector from "@/components/supported-chains";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,19 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { PenIcon } from "lucide-react";
 import { useState } from "react";
 import { SupportedChain, useWallet } from "web3-connect-react";
-
-const supportedChains: SupportedChain[] = ["solana", "ethereum"];
 
 export default function SignMessageExample() {
   const [message, setMessage] = useState("");
@@ -40,6 +32,7 @@ export default function SignMessageExample() {
       })
       .catch((e) => {
         alert(e.message);
+        console.error(e);
       });
   };
 
@@ -52,18 +45,10 @@ export default function SignMessageExample() {
               <PenIcon className="h-6 w-6" />
               Sign Message
             </CardTitle>
-            <Select value={selectedOption} onValueChange={setSelectedOption}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Select chain" />
-              </SelectTrigger>
-              <SelectContent>
-                {supportedChains.map((chain) => (
-                  <SelectItem value={chain} key={chain}>
-                    {chain}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SupportedChainsSelector
+              selectedOption={selectedOption}
+              setSelectedOption={setSelectedOption}
+            />
           </div>
           <CardDescription>Sign a message using your wallet</CardDescription>
         </CardHeader>
@@ -75,7 +60,7 @@ export default function SignMessageExample() {
             className="min-h-[100px]"
           />
           {result && (
-            <span className={"pt-2"}>
+            <span className={"pt-2 break-all"}>
               <strong>Result:</strong> {JSON.stringify(result, null, 4)}
             </span>
           )}
