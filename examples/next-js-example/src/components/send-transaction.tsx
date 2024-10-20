@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Toast } from "next/dist/client/components/react-dev-overlay/internal/components/Toast";
 
 const formSchema = z.object({
   recipient: z.string(),
@@ -61,11 +62,13 @@ export default function SendTransaction() {
           chain: selectedChain as any,
           rpcUrl: "https://api.testnet.solana.com",
         })
+        .then((hash) => {
+          toast.success(`Transaction sent successfully! ${hash}`);
+          form.reset();
+        })
         .catch((e) => {
           alert(e.message);
         });
-      toast.success("Transaction sent successfully!");
-      form.reset();
     } catch (error) {
       toast.error("Failed to send transaction");
       console.error(error);
@@ -115,9 +118,9 @@ export default function SendTransaction() {
                   <FormControl>
                     <Input
                       type="number"
-                      step="0.000001"
+                      step="1"
                       min="0"
-                      placeholder="0.0"
+                      placeholder="0"
                       {...field}
                     />
                   </FormControl>
@@ -132,6 +135,7 @@ export default function SendTransaction() {
           </form>
         </Form>
       </CardContent>
+      <Toast />
     </Card>
   );
 }

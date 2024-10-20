@@ -42,6 +42,12 @@ describe("BaseProvider", () => {
           return "0x" + "1".repeat(64);
         }
 
+        if (request.method === "eth_getTransactionReceipt") {
+          return {
+            status: "0x1",
+          };
+        }
+
         if (request.method === "eth_call") {
           // Mock a successful contract call
           return "0x0000000000000000000000000000000000000000000000000000000000000001";

@@ -1,4 +1,4 @@
-import { Keypair, PublicKey } from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import {
   DesktopWithMetaMaskEnvironment,
@@ -6,8 +6,7 @@ import {
   MobileBrowserEnvironment,
   MobileMetaMaskEnvironment,
   MobileOKXEnvironment,
-} from "../../test/environments";
-import { BaseProvider } from "../base.provider";
+} from "../../test";
 import { OKXProvider } from "./okx.provider";
 
 describe("OKX Provider test", () => {
@@ -56,6 +55,7 @@ describe("OKX Provider test", () => {
       expectedProvider,
     }) => {
       const provider = new OKXProvider(await mockEnvironment.globalWindow!());
+      provider.init();
       expect(provider.isEnabled()).toBe(expectedEnabled);
       expect(provider.isVisible(mockEnvironment.isMobileDevice)).toBe(
         expectedVisible,

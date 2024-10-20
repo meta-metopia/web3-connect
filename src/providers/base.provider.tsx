@@ -20,6 +20,27 @@ import {
   WalletProvider,
 } from "./provider.interface";
 
+function waitForEtherTransactionFinished(
+  provider: EIP1193Provider,
+  txHash: string,
+) {
+  return new Promise((resolve, reject) => {
+    const checkTransaction = async () => {
+      const txReceipt = await provider.request({
+        method: "eth_getTransactionReceipt",
+        params: [txHash],
+      });
+      // check if the transaction has been mined
+      if (txReceipt) {
+        resolve(void 0);
+        return;
+      }
+      setTimeout(checkTransaction, 1000);
+    };
+    checkTransaction();
+  });
+}
+
 export class BaseProvider implements WalletProvider {
   metadata: MetaData = {
     name: "BaseProvider",
@@ -213,14 +234,14 @@ export class BaseProvider implements WalletProvider {
       throw new Error(`${chain} is not supported by this provider`);
     }
 
-    const from = await this.getWalletAddress();
-    if (!from) {
+    const [fromAddress] = await this.getWalletAddress();
+    if (!fromAddress) {
       throw new Error("No wallet address found");
     }
 
     const transactionParameters = {
       to,
-      from,
+      from: fromAddress,
       value: "0x" + ethers.parseEther(value).toString(16),
       data: data || "0x",
     };
@@ -230,7 +251,7 @@ export class BaseProvider implements WalletProvider {
         method: "eth_sendTransaction",
         params: [transactionParameters],
       });
-
+      await waitForEtherTransactionFinished(this.provider, txHash);
       return txHash;
     } catch (error) {
       console.error("Error sending transaction:", error);
