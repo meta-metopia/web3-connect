@@ -28,19 +28,25 @@ jest.mock("@web3modal/ethers", () => ({
   createWeb3Modal: jest.fn(),
 }));
 
-import { act, render, screen, waitFor } from "@testing-library/react";
+jest.mock("@solana/web3.js", () => ({
+  Keypair: {
+    generate: jest.fn(),
+    fromSecretKey: jest.fn(),
+  },
+  PublicKey: jest.fn(),
+}));
+
+import { render, screen, waitFor } from "@testing-library/react";
 import { EnvironmentContextProvider } from "../environment/EnvironmentContext";
 import { WalletContextProvider } from "./WalletContext";
 import "@testing-library/jest-dom";
-import { WalletProvider } from "../../sdk";
 import {
   DesktopWithMetaMaskEnvironment,
   DesktopWithOKXEnvironment,
   MobileBrowserEnvironment,
   MobileMetaMaskEnvironment,
   MobileOKXEnvironment,
-} from "../../test/environments";
-import { useWallet } from "./useWalletModal";
+} from "../../test";
 
 //TODO: skip ui test for now
 describe.skip("WalletContext", () => {

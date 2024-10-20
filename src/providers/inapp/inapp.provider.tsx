@@ -19,6 +19,7 @@ export class InAppWalletProvider extends BaseProvider {
     notInstalledText:
       "Dear friend, If you don't have a wallet yet, you can go to app store to get one.",
     downloadLink: "",
+    supportedChains: ["ethereum"],
   };
   rdns = "io.inapp";
 

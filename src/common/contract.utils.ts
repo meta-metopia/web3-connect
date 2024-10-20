@@ -1,5 +1,6 @@
 import { BrowserProvider, ethers } from "ethers";
 import { EIP1193Provider } from "../providers";
+import { SupportedChain } from "../sdk";
 
 interface CallContractMethodParams {
   provider: EIP1193Provider;
@@ -9,6 +10,7 @@ interface CallContractMethodParams {
   fromAddress?: string;
   params?: any[];
   value?: string;
+  chain?: SupportedChain;
   waitInterval?: number;
   timeout?: number;
 }
@@ -20,6 +22,7 @@ interface DeployContractParams {
   fromAddress: string;
   params?: any[];
   value?: string;
+  chain?: SupportedChain;
   waitInterval?: number;
   timeout?: number;
 }

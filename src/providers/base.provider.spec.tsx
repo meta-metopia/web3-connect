@@ -1,4 +1,6 @@
+import { Keypair } from "@solana/web3.js";
 import { ethers } from "ethers";
+import nacl from "tweetnacl";
 import { BaseProvider } from "./base.provider";
 import { EIP1193Provider } from "./provider.interface";
 
@@ -40,6 +42,12 @@ describe("BaseProvider", () => {
           return "0x" + "1".repeat(64);
         }
 
+        if (request.method === "eth_getTransactionReceipt") {
+          return {
+            status: "0x1",
+          };
+        }
+
         if (request.method === "eth_call") {
           // Mock a successful contract call
           return "0x0000000000000000000000000000000000000000000000000000000000000001";
@@ -58,7 +66,32 @@ describe("BaseProvider", () => {
   });
 
   beforeEach(() => {
-    walletProvider = new BaseProvider({} as any);
+    const solanaKeypair = Keypair.fromSecretKey(
+      Uint8Array.from([
+        174, 47, 154, 16, 202, 193, 206, 113, 199, 190, 53, 133, 169, 175, 31,
+        56, 222, 53, 138, 189, 224, 216, 117, 173, 10, 149, 53, 45, 73, 251,
+        237, 246, 15, 185, 186, 82, 177, 240, 148, 69, 241, 227, 167, 80, 141,
+        89, 240, 121, 121, 35, 172, 247, 68, 251, 226, 218, 48, 63, 176, 109,
+        168, 89, 238, 135,
+      ]),
+    );
+
+    walletProvider = new BaseProvider({
+      okxwallet: {
+        solana: {
+          connect: async () => wallet.address,
+          signMessage: async (messageBytes: Uint8Array) => {
+            const signatures = nacl.sign.detached(
+              messageBytes,
+              solanaKeypair.secretKey,
+            );
+            return {
+              signature: signatures,
+            };
+          },
+        },
+      },
+    } as any);
     walletProvider.provider = mockEip1193Provider;
   });
 
@@ -93,7 +126,7 @@ describe("BaseProvider", () => {
     );
   });
 
-  it("should be able to sign and verify a message", async () => {
+  it("should be able to sign and verify a message on Ethereum", async () => {
     const message = "test message";
     const signedMessage = await walletProvider.signMessage(message, {
       forAuthentication: true,
@@ -101,11 +134,11 @@ describe("BaseProvider", () => {
 
     expect(signedMessage).toBeDefined();
 
-    const verifiedMessage = await walletProvider.verifyMessage(
+    const verifiedMessage = await walletProvider.verifyMessage({
       message,
-      signedMessage,
-      wallet.address,
-    );
+      signature: signedMessage,
+      walletAddress: wallet.address,
+    });
     expect(verifiedMessage).toBeTruthy();
   });
 

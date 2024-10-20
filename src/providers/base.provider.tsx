@@ -1,4 +1,9 @@
 import { ethers } from "ethers";
+import nacl from "tweetnacl";
+import {
+  convertSolanaAddressStringToUint8Array,
+  hexToArray,
+} from "../common/address.utils";
 import { callContractMethod, deployContract } from "../common/contract.utils";
 import {
   CallContractMethodOptions,
@@ -11,8 +16,30 @@ import {
   EIP1193Provider,
   MetaData,
   SignMessageOptions,
+  VerifyMessageOptions,
   WalletProvider,
 } from "./provider.interface";
+
+function waitForEtherTransactionFinished(
+  provider: EIP1193Provider,
+  txHash: string,
+) {
+  return new Promise((resolve, reject) => {
+    const checkTransaction = async () => {
+      const txReceipt = await provider.request({
+        method: "eth_getTransactionReceipt",
+        params: [txHash],
+      });
+      // check if the transaction has been mined
+      if (txReceipt) {
+        resolve(void 0);
+        return;
+      }
+      setTimeout(checkTransaction, 1000);
+    };
+    checkTransaction();
+  });
+}
 
 export class BaseProvider implements WalletProvider {
   metadata: MetaData = {
@@ -22,6 +49,7 @@ export class BaseProvider implements WalletProvider {
     displayName: "Base provider",
     notInstalledText: "No provider found.",
     downloadLink: "",
+    supportedChains: ["ethereum"],
   };
   rdns = "test.base";
   provider: EIP1193Provider | undefined;
@@ -74,26 +102,31 @@ export class BaseProvider implements WalletProvider {
     }
 
     // sign the message
+    const [fromAddress] = await this.getWalletAddress();
     const messageToBeSigned = `0x${Buffer.from(strMessage, "utf8").toString("hex")}`;
-    const signature = await this.provider.request({
+    return await this.provider.request({
       method: "personal_sign",
-      params: [messageToBeSigned, await this.getWalletAddress()],
+      params: [messageToBeSigned, fromAddress],
     });
-    return signature;
   }
 
   /**
    * Verify the signed message
    */
   // eslint-disable-next-line
-  async verifyMessage(
-    message: string,
-    signature: string,
-    walletAddress: string,
-  ): Promise<boolean> {
-    const bytesMessage = `0x${Buffer.from(message, "utf8").toString("hex")}`;
-    const recoveredAddress = ethers.verifyMessage(bytesMessage, signature);
-    return recoveredAddress === walletAddress;
+  async verifyMessage(opts: VerifyMessageOptions): Promise<boolean> {
+    if (opts.chain === "solana") {
+      const backToUint8Array = hexToArray(opts.signature);
+      return nacl.sign.detached.verify(
+        new TextEncoder().encode(opts.message),
+        backToUint8Array,
+        convertSolanaAddressStringToUint8Array(opts.walletAddress),
+      );
+    }
+
+    const bytesMessage = `0x${Buffer.from(opts.message, "utf8").toString("hex")}`;
+    const recoveredAddress = ethers.verifyMessage(bytesMessage, opts.signature);
+    return recoveredAddress === opts.walletAddress;
   }
 
   async addNetwork(
@@ -201,14 +234,14 @@ export class BaseProvider implements WalletProvider {
       throw new Error(`${chain} is not supported by this provider`);
     }
 
-    const from = await this.getWalletAddress();
-    if (!from) {
+    const [fromAddress] = await this.getWalletAddress();
+    if (!fromAddress) {
       throw new Error("No wallet address found");
     }
 
     const transactionParameters = {
       to,
-      from,
+      from: fromAddress,
       value: "0x" + ethers.parseEther(value).toString(16),
       data: data || "0x",
     };
@@ -218,7 +251,7 @@ export class BaseProvider implements WalletProvider {
         method: "eth_sendTransaction",
         params: [transactionParameters],
       });
-
+      await waitForEtherTransactionFinished(this.provider, txHash);
       return txHash;
     } catch (error) {
       console.error("Error sending transaction:", error);
@@ -287,7 +320,11 @@ export class BaseProvider implements WalletProvider {
     });
   }
 
-  async disconnect(): Promise<void> {}
+  async disconnect(): Promise<void> {
+    if ("disconnect" in this.provider) {
+      await (this.provider as any).disconnect();
+    }
+  }
 
   async getBalance(): Promise<string> {
     if (this.provider === undefined) {

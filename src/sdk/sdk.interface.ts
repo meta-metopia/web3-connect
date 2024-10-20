@@ -56,6 +56,9 @@ export interface SendTransactionOptions {
    * Data to send with the transaction
    */
   data?: string;
+
+  rpcUrl?: string;
+
   /**
    * Optional field to specify `send transaction` on a non-default blockchain.
    * If not specified, "ethereum" is used as the default. Note, not all providers support this field.
