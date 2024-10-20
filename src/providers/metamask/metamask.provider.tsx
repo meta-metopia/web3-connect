@@ -12,7 +12,7 @@ export class MetaMaskProvider extends BaseProvider {
     notInstalledText:
       "Dear friend, If you don't have a wallet yet, you can go to install MetaMask and create one now.",
     downloadLink: "https://metamask.io/",
-    supportedChains: ["ethereum", "solana"],
+    supportedChains: ["ethereum"],
   };
   rdns = "io.metamask";
 

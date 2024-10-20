@@ -5,18 +5,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SupportedChain } from "web3-connect-react";
+import { WalletProvider } from "web3-connect-react";
 
 interface SupportedChainsSelectorProps {
   selectedOption: string;
   setSelectedOption: (value: string) => void;
+  provider: WalletProvider;
 }
-
-const supportedChains: SupportedChain[] = ["solana", "ethereum"];
 
 export default function SupportedChainsSelector({
   selectedOption,
   setSelectedOption,
+  provider,
 }: SupportedChainsSelectorProps) {
   return (
     <Select value={selectedOption} onValueChange={setSelectedOption}>
@@ -24,7 +24,7 @@ export default function SupportedChainsSelector({
         <SelectValue placeholder="Select chain" />
       </SelectTrigger>
       <SelectContent>
-        {supportedChains.map((chain) => (
+        {provider.metadata.supportedChains.map((chain) => (
           <SelectItem value={chain} key={chain}>
             {chain}
           </SelectItem>

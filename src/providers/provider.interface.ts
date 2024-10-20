@@ -24,10 +24,6 @@ export interface VerifyMessageOptions {
   walletAddress: string;
 }
 
-export interface ClaimParams {
-  signature: string;
-}
-
 export interface EIP6963ProviderInfo {
   rdns: string;
   uuid: string;

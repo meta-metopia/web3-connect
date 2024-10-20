@@ -1,22 +1,22 @@
-import { EIP6963AnnounceProviderEvent } from "../../sdk";
+import { ConnectionResponse, EIP6963AnnounceProviderEvent } from "../../sdk";
 import { MultiWalletProvider } from "../multi-wallet.provider";
 import { MetaData } from "../provider.interface";
-import { OKXWalletIcon } from "./okx.icon";
+import PhantomIcon from "./phantom.icon";
 
-export class OKXProvider extends MultiWalletProvider {
+export class PhantomProvider extends MultiWalletProvider {
   metadata: MetaData = {
-    name: "OKX",
-    image: <OKXWalletIcon />,
+    name: "Phantom",
+    image: <PhantomIcon />,
     description:
       "Connect using a browser plugin or mobile app. Best supported on Chrome or Firefox.",
     notInstalledText:
-      "Dear friend, If you don't have a wallet yet, you can go to install OKX Wallet and create one now.",
-    displayName: "OKX Wallet",
-    downloadLink: "https://www.okx.com/web3",
+      "Dear friend, If you don't have a wallet yet, you can go to install Phantom Wallet and create one now.",
+    displayName: "Phantom Wallet",
+    downloadLink: "https://phantom.app/",
     iconBackgroundColor: "black",
     supportedChains: ["ethereum", "solana"],
   };
-  rdns = "com.okex.wallet";
+  rdns = "app.phantom";
 
   init() {
     if (this.globalWindow === undefined) {
@@ -35,6 +35,10 @@ export class OKXProvider extends MultiWalletProvider {
   }
 
   protected getSolanaProvider() {
-    return this.globalWindow.okxwallet.solana;
+    return this.globalWindow.phantom.solana;
+  }
+
+  async connect(): Promise<ConnectionResponse> {
+    return super.connect();
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { ContractInteract } from "@/components/contract-interact";
+import SendTransaction from "@/components/send-transaction";
 import SignMessageExample from "@/components/sign-message";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WalletConnect } from "@/components/wallet-connect";
@@ -51,7 +52,7 @@ export default function Home() {
                   <ContractInteract />
                 </TabsContent>
                 <TabsContent value="transactions" className="p-6">
-                  <ContractInteract />
+                  <SendTransaction />
                 </TabsContent>
                 <TabsContent value="sign-message" className="p-6">
                   <SignMessageExample />

@@ -17,7 +17,7 @@ import { SupportedChain, useWallet } from "web3-connect-react";
 
 export default function SignMessageExample() {
   const [message, setMessage] = useState("");
-  const [selectedOption, setSelectedOption] = useState<string>("solana");
+  const [selectedOption, setSelectedOption] = useState<string>("ethereum");
   const [result, setResult] = useState<string | null>(null);
   const { sdk, isSignedIn } = useWallet();
 
@@ -45,10 +45,13 @@ export default function SignMessageExample() {
               <PenIcon className="h-6 w-6" />
               Sign Message
             </CardTitle>
-            <SupportedChainsSelector
-              selectedOption={selectedOption}
-              setSelectedOption={setSelectedOption}
-            />
+            {sdk.provider && (
+              <SupportedChainsSelector
+                provider={sdk.provider}
+                selectedOption={selectedOption}
+                setSelectedOption={setSelectedOption}
+              />
+            )}
           </div>
           <CardDescription>Sign a message using your wallet</CardDescription>
         </CardHeader>

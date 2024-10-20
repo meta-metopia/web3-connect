@@ -299,7 +299,11 @@ export class BaseProvider implements WalletProvider {
     });
   }
 
-  async disconnect(): Promise<void> {}
+  async disconnect(): Promise<void> {
+    if ("disconnect" in this.provider) {
+      await (this.provider as any).disconnect();
+    }
+  }
 
   async getBalance(): Promise<string> {
     if (this.provider === undefined) {
