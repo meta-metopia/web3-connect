@@ -1,6 +1,7 @@
 "use client";
 
 import { ContractInteract } from "@/components/contract-interact";
+import SignMessageExample from "@/components/sign-message";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WalletConnect } from "@/components/wallet-connect";
 import { AnimatePresence, motion } from "framer-motion";
@@ -26,16 +27,34 @@ export default function Home() {
                 defaultValue="smart-contract"
                 className="bg-white border rounded-xl overflow-hidden"
               >
-                <TabsList className=" m-2">
+                <TabsList className="m-5">
                   <TabsTrigger
                     value="smart-contract"
                     className="px-4 py-2 rounded-md"
                   >
                     Interact with Contract
                   </TabsTrigger>
+                  <TabsTrigger
+                    value="transactions"
+                    className="px-4 py-2 rounded-md"
+                  >
+                    Transactions
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="sign-message"
+                    className="px-4 py-2 rounded-md"
+                  >
+                    Sign Message
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="smart-contract" className="p-6">
                   <ContractInteract />
+                </TabsContent>
+                <TabsContent value="transactions" className="p-6">
+                  <ContractInteract />
+                </TabsContent>
+                <TabsContent value="sign-message" className="p-6">
+                  <SignMessageExample />
                 </TabsContent>
               </Tabs>
             </motion.div>

@@ -1,3 +1,4 @@
+import React from "react";
 import { AvailableProvider } from "../common";
 import {
   CallContractMethodOptions,
@@ -14,6 +15,13 @@ export interface SignMessageOptions {
   forAuthentication?: boolean;
 
   chain?: SupportedChain;
+}
+
+export interface VerifyMessageOptions {
+  chain?: SupportedChain;
+  message: string;
+  signature: string;
+  walletAddress: string;
 }
 
 export interface ClaimParams {
@@ -63,6 +71,7 @@ export interface MetaData {
   downloadLink?: string;
   notInstalledText: string;
   iconBackgroundColor?: string;
+  supportedChains: SupportedChain[];
 }
 
 export interface WalletProvider {
@@ -174,15 +183,9 @@ export interface WalletProvider {
 
   /**
    *
-   * @param message Message to verify
-   * @param signature Signed message
-   * @param walletAddress Wallet address to verify
+   * @param opts The message to verify
    */
-  verifyMessage(
-    message: string,
-    signature: string,
-    walletAddress: string,
-  ): Promise<boolean>;
+  verifyMessage(opts: VerifyMessageOptions): Promise<boolean>;
 
   metadata: MetaData;
 }

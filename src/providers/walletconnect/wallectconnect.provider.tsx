@@ -21,6 +21,7 @@ import {
 import {
   MetaData,
   SignMessageOptions,
+  VerifyMessageOptions,
   WalletProvider,
 } from "../provider.interface";
 import { WalletConnectIcon } from "./WalletConnect.icon";
@@ -162,13 +163,9 @@ export class WalletConnectProvider implements WalletProvider {
   }
 
   // eslint-disable-next-line
-  async verifyMessage(
-    message: string,
-    signature: string,
-    walletAddress: string,
-  ): Promise<boolean> {
-    const recoveredAddress = ethers.verifyMessage(message, signature);
-    return recoveredAddress === walletAddress;
+  async verifyMessage(opts: VerifyMessageOptions): Promise<boolean> {
+    const recoveredAddress = ethers.verifyMessage(opts.message, opts.signature);
+    return recoveredAddress === opts.walletAddress;
   }
 
   // eslint-disable-next-line
@@ -196,6 +193,7 @@ export class WalletConnectProvider implements WalletProvider {
     displayName: "Wallet Connect",
     notInstalledText:
       "WalletConnect is not available at this moment. Please try again later.",
+    supportedChains: ["ethereum"],
   };
 
   isVisible(): boolean {

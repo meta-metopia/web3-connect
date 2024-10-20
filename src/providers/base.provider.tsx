@@ -1,4 +1,9 @@
 import { ethers } from "ethers";
+import nacl from "tweetnacl";
+import {
+  convertSolanaAddressStringToUint8Array,
+  hexToArray,
+} from "../common/address.utils";
 import { callContractMethod, deployContract } from "../common/contract.utils";
 import {
   CallContractMethodOptions,
@@ -11,6 +16,7 @@ import {
   EIP1193Provider,
   MetaData,
   SignMessageOptions,
+  VerifyMessageOptions,
   WalletProvider,
 } from "./provider.interface";
 
@@ -22,6 +28,7 @@ export class BaseProvider implements WalletProvider {
     displayName: "Base provider",
     notInstalledText: "No provider found.",
     downloadLink: "",
+    supportedChains: ["ethereum"],
   };
   rdns = "test.base";
   provider: EIP1193Provider | undefined;
@@ -86,14 +93,19 @@ export class BaseProvider implements WalletProvider {
    * Verify the signed message
    */
   // eslint-disable-next-line
-  async verifyMessage(
-    message: string,
-    signature: string,
-    walletAddress: string,
-  ): Promise<boolean> {
-    const bytesMessage = `0x${Buffer.from(message, "utf8").toString("hex")}`;
-    const recoveredAddress = ethers.verifyMessage(bytesMessage, signature);
-    return recoveredAddress === walletAddress;
+  async verifyMessage(opts: VerifyMessageOptions): Promise<boolean> {
+    if (opts.chain === "solana") {
+      const backToUint8Array = hexToArray(opts.signature);
+      return nacl.sign.detached.verify(
+        new TextEncoder().encode(opts.message),
+        backToUint8Array,
+        convertSolanaAddressStringToUint8Array(opts.walletAddress),
+      );
+    }
+
+    const bytesMessage = `0x${Buffer.from(opts.message, "utf8").toString("hex")}`;
+    const recoveredAddress = ethers.verifyMessage(bytesMessage, opts.signature);
+    return recoveredAddress === opts.walletAddress;
   }
 
   async addNetwork(

@@ -1,6 +1,14 @@
-import { SupportedChain } from "../../sdk";
+import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { arrayToHex } from "../../common/address.utils";
+import {
+  CallContractMethodOptions,
+  DeployContractOptions,
+  EIP6963AnnounceProviderEvent,
+  SendTransactionOptions,
+  SupportedChain,
+} from "../../sdk";
 import { BaseProvider } from "../base.provider";
-import { EIP6963AnnounceProviderEvent, MetaData } from "../provider.interface";
+import { MetaData, SignMessageOptions } from "../provider.interface";
 import { OKXWalletIcon } from "./okx.icon";
 
 export class OKXProvider extends BaseProvider {
@@ -14,6 +22,7 @@ export class OKXProvider extends BaseProvider {
     displayName: "OKX Wallet",
     downloadLink: "https://www.okx.com/web3",
     iconBackgroundColor: "black",
+    supportedChains: ["ethereum", "solana"],
   };
   rdns = "com.okex.wallet";
 
@@ -61,5 +70,60 @@ export class OKXProvider extends BaseProvider {
       addresses.push(address.publicKey.toString());
     }
     return addresses;
+  }
+
+  async signMessage(obj: any, opts: SignMessageOptions): Promise<string> {
+    if (opts.chain === "solana") {
+      let strMessage = "";
+      if (typeof obj === "string") {
+        strMessage = obj;
+      }
+
+      if (typeof obj === "object") {
+        strMessage = JSON.stringify(obj);
+      }
+
+      const encodedMessage = new TextEncoder().encode(strMessage);
+      const provider = this.globalWindow.okxwallet.solana;
+      await provider.connect();
+      const res = await provider.signMessage(encodedMessage, "utf8");
+      return arrayToHex(res.signature);
+    }
+    return super.signMessage(obj, opts);
+  }
+
+  async sendTransaction(options: SendTransactionOptions): Promise<string> {
+    if (options.chain === "solana") {
+      const provider = this.globalWindow.okxwallet.solana;
+      const [fromPubkey] = await this.getWalletAddress("solana");
+      const toPubKey = new PublicKey(options.to);
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: new PublicKey(fromPubkey),
+          toPubkey: toPubKey,
+          lamports: BigInt(options.value),
+        }),
+      );
+      const signedTransaction =
+        await provider.signAndSendTransaction(transaction);
+      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+      console.log(signedTransaction);
+    }
+    return super.sendTransaction(options);
+  }
+
+  async deployContract(options: DeployContractOptions): Promise<string> {
+    if (options.chain === "solana") {
+    }
+
+    return super.deployContract(options);
+  }
+
+  async callContractMethod(
+    options: CallContractMethodOptions,
+  ): Promise<string> {
+    if (options.chain === "solana") {
+    }
+    return super.callContractMethod(options);
   }
 }
