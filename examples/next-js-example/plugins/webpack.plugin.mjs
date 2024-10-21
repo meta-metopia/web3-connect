@@ -16,6 +16,9 @@ export default class GitVersionListPlugin {
       encoding: "utf-8",
     }).trim();
   }
+  getCurrentTag() {
+    return process.env.CURRENT_TAG;
+  }
 
   apply(compiler) {
     compiler.hooks.beforeCompile.tapAsync(
@@ -25,8 +28,11 @@ export default class GitVersionListPlugin {
           // Get all git tags
           const tagsOutput = execSync("git tag", { encoding: "utf-8" });
           const tags = tagsOutput.split("\n").filter(Boolean);
-          const currentBranch = this.getCurrentGitBranch();
+          const currentTag = this.getCurrentTag();
+          const currentBranch = currentTag ?? this.getCurrentGitBranch();
 
+          // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+          console.log("currentBranch", currentBranch);
           // Filter tags greater than minVersion
           const filteredTags = tags
             .filter((tag) => {
