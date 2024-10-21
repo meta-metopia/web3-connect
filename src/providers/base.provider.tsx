@@ -245,18 +245,15 @@ export class BaseProvider implements WalletProvider {
     const transactionParameters: ethers.TransactionLike = {
       to,
       from: fromAddress,
-      value: BigInt(value),
+      value: value,
       data: data || "0x",
     };
-
-    console.log("transactionParameters", transactionParameters);
 
     try {
       const txHash = await this.provider.request({
         method: "eth_sendTransaction",
         params: [transactionParameters],
       });
-      console.log("txHash", txHash);
       await waitForEtherTransactionFinished(this.provider, txHash);
       return txHash;
     } catch (error) {

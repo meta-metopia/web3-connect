@@ -67,7 +67,8 @@ export default function SendTransaction() {
       .catch((e) => {
         alert(e.message);
         setIsLoading(false);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }
 
   return (
@@ -117,7 +118,10 @@ export default function SendTransaction() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>Enter the amount to send.</FormDescription>
+                  <FormDescription>
+                    Enter the amount to send. ( wei in Ethereum, lamports in
+                    Solana, etc. )
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

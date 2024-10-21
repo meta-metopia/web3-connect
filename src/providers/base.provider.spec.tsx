@@ -271,7 +271,7 @@ describe("BaseProvider with VM", () => {
             let tx = LegacyTransaction.fromTxData({
               gasLimit: 21000,
               gasPrice: 10,
-              value: txParams.value,
+              value: BigInt(txParams.value),
               data: txParams.data,
               to: txParams.to,
             });

@@ -89,36 +89,51 @@ export function WalletConnect() {
           <div className="space-y-4">
             {sdk?.walletProviders
               .filter((p) => p.isVisible(false))
-              .map((p) => (
-                <Card key={p.metadata.name}>
-                  <CardContent className="flex items-center justify-between p-4 flex-wrap">
-                    <div>
-                      <div className="font-semibold flex flex-row items-center space-x-2">
-                        <span> {p.metadata.name}</span>
-                        {React.cloneElement(p.metadata.image as any, {
-                          className: `!w-8 !h-8 bg-[${p.metadata.iconBackgroundColor}] rounded-lg p-1`,
-                        })}
+              .map((p) => {
+                const isConnected =
+                  sdk.provider?.metadata.name === p.metadata.name;
+                return (
+                  <Card key={p.metadata.name}>
+                    <CardContent className="flex items-center justify-between p-4 flex-wrap">
+                      <div>
+                        <div className="font-semibold flex flex-row items-center space-x-2">
+                          <span> {p.metadata.name}</span>
+                          {React.cloneElement(p.metadata.image as any, {
+                            className: `!w-8 !h-8 bg-[${p.metadata.iconBackgroundColor}] rounded-lg p-1`,
+                          })}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {p.metadata.description}
+                        </p>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        {p.metadata.description}
-                      </p>
-                    </div>
-                    <Button
-                      variant={
-                        p.isEnabled(sdk.walletProviders)
-                          ? "default"
-                          : "secondary"
-                      }
-                      onClick={() => handleSignIn(p.metadata.name)}
-                    >
-                      <Wallet className="w-4 h-4 mr-2" />
-                      {p.isEnabled(sdk.walletProviders)
-                        ? "Connect"
-                        : "Disabled"}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      <Button
+                        variant={
+                          isConnected
+                            ? "ghost"
+                            : p.isEnabled(sdk.walletProviders)
+                              ? "default"
+                              : "secondary"
+                        }
+                        onClick={async () => {
+                          if (p.isEnabled(sdk.walletProviders)) {
+                            await handleSignIn(p.metadata.name);
+                          } else {
+                            window.open(p.metadata.downloadLink, "_blank");
+                          }
+                        }}
+                        disabled={sdk.provider !== undefined}
+                      >
+                        {!isConnected && <Wallet className="w-4 h-4 mr-2" />}
+                        {isConnected
+                          ? "Connected"
+                          : p.isEnabled(sdk.walletProviders)
+                            ? "Connect"
+                            : "Not Installed"}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
           </div>
           <div className={"mt-6"}>
             <h3 className="text-lg font-semibold mb-4">Wallet addresses</h3>
