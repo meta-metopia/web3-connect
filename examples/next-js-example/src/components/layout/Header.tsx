@@ -55,17 +55,19 @@ export default function Header() {
       </div>
 
       <div className={"flex-1"} />
-      <Select onValueChange={navigate}>
+      <Select onValueChange={navigate} defaultValue={currentBranch}>
         <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Versions" defaultValue={"latest"} />
+          <SelectValue placeholder="Versions" defaultValue={currentBranch} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={currentBranch}>{currentBranch}</SelectItem>
-          {gitVersions.map((version) => (
-            <SelectItem value={version} key={`${version}`}>
-              {version}
-            </SelectItem>
-          ))}
+          {gitVersions
+            .filter((v: any) => v !== currentBranch)
+            .map((version) => (
+              <SelectItem value={version} key={`${version}`}>
+                {version}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     </header>
