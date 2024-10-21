@@ -94,7 +94,7 @@ export function WalletConnect() {
                   sdk.provider?.metadata.name === p.metadata.name;
                 return (
                   <Card key={p.metadata.name}>
-                    <CardContent className="flex items-center justify-between p-4 flex-wrap">
+                    <CardContent className="flex items-center justify-between p-4 flex-wrap space-y-4">
                       <div>
                         <div className="font-semibold flex flex-row items-center space-x-2">
                           <span> {p.metadata.name}</span>
