@@ -8,8 +8,10 @@ import { Loader2, RefreshCw, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useWallet } from "web3-connect-react";
 
+const contractStorageKey = "contractAddress";
+
 export function ContractInteract() {
-  const { sdk, walletAddress } = useWallet();
+  const { sdk } = useWallet();
   const [value, setValue] = useState<string>("");
   const [currentBalance, setCurrentBalance] = useState<string>("");
   const [isMinting, setIsMinting] = useState<boolean>(false);
@@ -29,7 +31,7 @@ export function ContractInteract() {
           bytecode,
         })
         .finally(() => setIsDeploying(false));
-      sessionStorage.setItem("contractAddress", address);
+      sessionStorage.setItem(contractStorageKey, address);
       setContractAddress(address);
     } catch (error: any) {
       console.error(error);
@@ -38,16 +40,17 @@ export function ContractInteract() {
   };
 
   const deleteContract = () => {
-    sessionStorage.removeItem("contractAddress");
+    sessionStorage.removeItem(contractStorageKey);
     setContractAddress(null);
   };
 
   const getBalance = async () => {
-    if (!walletAddress || !sdk || !sdk.provider || !contractAddress) {
+    if (!sdk || !sdk.provider || !contractAddress) {
       return;
     }
     try {
       setIsRefreshing(true);
+      const [walletAddress] = await sdk.getWalletAddress("ethereum");
       const result = await sdk.callContractMethod({
         contractAddress,
         abi,
@@ -64,11 +67,18 @@ export function ContractInteract() {
   };
 
   const mint = async () => {
-    if (!walletAddress || !sdk || !sdk.provider || !contractAddress) {
+    if (!sdk || !sdk.provider || !contractAddress) {
+      console.error(
+        "Missing wallet address or sdk",
+        sdk,
+        sdk.provider,
+        contractAddress,
+      );
       return;
     }
     try {
       setIsMinting(true);
+      const [walletAddress] = await sdk.getWalletAddress("ethereum");
       await sdk.callContractMethod({
         contractAddress,
         abi,
@@ -85,11 +95,11 @@ export function ContractInteract() {
   };
 
   useEffect(() => {
-    const contractAddress = sessionStorage.getItem("contractAddress");
+    const contractAddress = sessionStorage.getItem(contractStorageKey);
     setContractAddress(contractAddress);
 
     if (contractAddress) getBalance();
-  }, [sdk, walletAddress, sdk.provider, contractAddress]);
+  }, [sdk, sdk.provider, contractAddress]);
 
   return (
     <Card className="w-full">
@@ -142,7 +152,7 @@ export function ContractInteract() {
               variant="outline"
               size="icon"
               onClick={getBalance}
-              disabled={isRefreshing || !walletAddress || !sdk || !sdk.provider}
+              disabled={isRefreshing || !sdk || !sdk.provider}
             >
               <RefreshCw
                 className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}

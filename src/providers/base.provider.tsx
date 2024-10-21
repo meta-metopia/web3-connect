@@ -37,7 +37,10 @@ function waitForEtherTransactionFinished(
       }
       setTimeout(checkTransaction, 1000);
     };
-    checkTransaction();
+    checkTransaction().catch((e) => {
+      console.error("Error checking transaction", e);
+      reject(e);
+    });
   });
 }
 
@@ -242,7 +245,7 @@ export class BaseProvider implements WalletProvider {
     const transactionParameters: ethers.TransactionLike = {
       to,
       from: fromAddress,
-      value: BigInt(value),
+      value: value,
       data: data || "0x",
     };
 

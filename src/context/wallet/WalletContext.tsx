@@ -29,7 +29,6 @@ interface IWalletContext {
   balance: string;
   sdk: SdkInterface;
   chainId?: number;
-  walletAddress?: string;
   signIn: (
     provider: AvailableProvider,
     callbacks: SignInCallbacks,
@@ -96,7 +95,6 @@ function WalletContextProvider({
   const [isSignedIn, setIsSignedIn] = useState(session.isAuth);
   const [isLoading, setIsLoading] = useState(true);
   const [chainId, setChainId] = useState<number>();
-  const [walletAddress] = useState<string | undefined>(session.walletAddress);
 
   const { isMobileDevice, globalWindow, isTest } = useEnvironment();
 
@@ -222,7 +220,6 @@ function WalletContextProvider({
     balance: balance ?? "0",
     sdk,
     chainId,
-    walletAddress,
     signIn,
     signOut,
     switchNetwork,

@@ -53,28 +53,22 @@ export default function SendTransaction() {
     }
 
     setIsLoading(true);
-    try {
-      // Implement your transaction logic here
-      await sdk
-        .sendTransaction({
-          to: values.recipient,
-          value: values.amount,
-          chain: selectedChain as any,
-          rpcUrl: "https://api.testnet.solana.com",
-        })
-        .then((hash) => {
-          toast.success(`Transaction sent successfully! ${hash}`);
-          form.reset();
-        })
-        .catch((e) => {
-          alert(e.message);
-        });
-    } catch (error) {
-      toast.error("Failed to send transaction");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+    await sdk
+      .sendTransaction({
+        to: values.recipient,
+        value: values.amount,
+        chain: selectedChain as any,
+        rpcUrl: "https://api.testnet.solana.com",
+      })
+      .then((hash) => {
+        toast.success(`Transaction sent successfully! ${hash}`);
+        form.reset();
+      })
+      .catch((e) => {
+        alert(e.message);
+        setIsLoading(false);
+      })
+      .finally(() => setIsLoading(false));
   }
 
   return (
@@ -124,7 +118,10 @@ export default function SendTransaction() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>Enter the amount to send.</FormDescription>
+                  <FormDescription>
+                    Enter the amount to send. ( wei in Ethereum, lamports in
+                    Solana, etc. )
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
