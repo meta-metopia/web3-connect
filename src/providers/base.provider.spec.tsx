@@ -1,3 +1,6 @@
+import { LegacyTransaction } from "@ethereumjs/tx";
+import { Account, Address, bytesToHex, hexToBytes } from "@ethereumjs/util";
+import { VM } from "@ethereumjs/vm";
 import { Keypair } from "@solana/web3.js";
 import { ethers } from "ethers";
 import nacl from "tweetnacl";
@@ -38,6 +41,8 @@ describe("BaseProvider", () => {
 
         if (request.method === "eth_sendTransaction") {
           const txParams = request.params![0];
+          expect(ethers.isAddress(txParams.from)).toBeTruthy();
+          expect(ethers.isAddress(txParams.to)).toBeTruthy();
           // Mock a transaction hash
           return "0x" + "1".repeat(64);
         }
@@ -225,5 +230,121 @@ describe("BaseProvider", () => {
         value: "0",
       }),
     ).rejects.toThrow("Provider not found");
+  });
+});
+
+describe("BaseProvider with VM", () => {
+  let provider: BaseProvider;
+  let mockProvider: any;
+  let vm: VM;
+  let testWallet: ethers.HDNodeWallet;
+
+  beforeEach(async () => {
+    vm = await VM.create();
+    testWallet = ethers.Wallet.createRandom();
+
+    // Fund the test account
+    await vm.stateManager.putAccount(
+      Address.fromString(testWallet.address),
+      Account.fromAccountData({ balance: BigInt(10000000000000000000) }), // 10 ETH
+    );
+
+    mockProvider = {
+      request: async ({
+        method,
+        params,
+      }: { method: string; params: any[] }) => {
+        switch (method) {
+          case "eth_accounts":
+          case "eth_requestAccounts":
+            return [testWallet.address];
+
+          case "eth_getBalance":
+            const account = await vm.stateManager.getAccount(
+              Address.fromString(params[0]),
+            );
+            return "0x" + account.balance.toString(16);
+
+          case "eth_sendTransaction": {
+            const [txParams] = params;
+
+            let tx = LegacyTransaction.fromTxData({
+              gasLimit: 21000,
+              gasPrice: 10,
+              value: txParams.value,
+              data: txParams.data,
+              to: txParams.to,
+            });
+
+            // use the wallet to sign the transaction
+            const pk = hexToBytes(testWallet.privateKey);
+            tx = tx.sign(pk);
+            await vm.runTx({
+              tx,
+            });
+
+            // return the transaction hash
+            return bytesToHex(tx.hash());
+          }
+
+          case "eth_getTransactionReceipt": {
+            return {
+              status: "0x1",
+              transactionHash: params[0],
+              blockNumber: "0x1",
+              blockHash: "0x" + Buffer.alloc(32).toString("hex"),
+              from: testWallet.address,
+              gasUsed: "0x5208",
+            };
+          }
+
+          case "personal_sign": {
+            const [message] = params;
+            return testWallet.signMessage(ethers.getBytes(message));
+          }
+
+          case "eth_chainId":
+            return "0x1";
+
+          default:
+            throw new Error(`Unhandled method: ${method}`);
+        }
+      },
+      on: jest.fn(),
+    };
+
+    const mockWindow = { ethereum: mockProvider };
+    provider = new BaseProvider(mockWindow);
+    provider.provider = mockProvider;
+  });
+
+  it("should connect and get correct address", async () => {
+    const result = await provider.connect();
+    expect(result.walletAddress.toLowerCase()).toBe(
+      testWallet.address.toLowerCase(),
+    );
+  });
+
+  it("should get correct balance", async () => {
+    const balance = await provider.getBalance();
+    expect(BigInt(balance)).toBe(BigInt(10000000000000000000));
+  });
+
+  it("should send transaction with correct value", async () => {
+    const recipient = "0x1234567890123456789012345678901234567890";
+    const value = "1000000000000000000"; // 1 ETH
+
+    const txHash = await provider.sendTransaction({
+      to: recipient,
+      value,
+      chain: "ethereum",
+    });
+
+    expect(txHash).toMatch(/^0x[0-9a-f]{64}$/);
+
+    const recipientBalance = await vm.stateManager.getAccount(
+      Address.fromString(recipient),
+    );
+    expect(recipientBalance.balance).toBe(BigInt(value));
   });
 });
