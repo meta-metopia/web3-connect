@@ -7,24 +7,28 @@ jobs:
   deploy-docs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      SCOPE: ${{ secrets.SCOPE }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        name: Building project
+        with:
+          fetch-tags: 'true'
+          fetch-depth: '0'
+      - uses: pnpm/action-setup@v3
+        with:
+          version: latest
+      - name: Build preview
+        run: pnpm i && pnpm build
       - name: Get tag name and replace dots
         run: |
           TAG=$(echo ${{ github.event.release.tag_name }} | tr '.' '-')
           echo "MODIFIED_TAG=$TAG" >> $GITHUB_ENV
-      - uses: amondnet/vercel-action@v25
-        name: Deploying Website
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.ORG_ID}}
-          vercel-project-id: ${{ secrets.PROJECT_ID }}
-          scope: ${{secrets.SCOPE}}
-          vercel-args: "--prod"
-          alias-domains: |
-            ${{ env.MODIFIED_TAG }}-web3-connect.pagepreview.dev
+      - name: Deploy preview
+        run: PREVIEW_URL=${{ env.MODIFIED_TAG }}-web3-connect.pagepreview.dev ./scripts/deploy-prod.sh
+        working-directory: examples/next-js-example
   release-npm:
     runs-on: ubuntu-latest
     env:
