@@ -39,7 +39,7 @@ function waitForSolanaTransactionFinished(
 
 export class MultiWalletProvider extends BaseProvider {
   protected getSolanaProvider(): any {
-    throw new Error("Not implemented");
+    return this.globalWindow.multipleWallet.solana;
   }
 
   async getWalletAddress(...chains: SupportedChain[]): Promise<string[]> {

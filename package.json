@@ -35,6 +35,7 @@
   "license": "ISC",
   "dependencies": {
     "@biomejs/biome": "^1.9.3",
+    "@ethereumjs/tx": "^5.4.0",
     "@solana/web3.js": "^1.95.4",
     "@types/jest": "^29.5.13",
     "@types/react": "^18.3.11",

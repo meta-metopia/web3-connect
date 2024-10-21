@@ -239,10 +239,10 @@ export class BaseProvider implements WalletProvider {
       throw new Error("No wallet address found");
     }
 
-    const transactionParameters = {
+    const transactionParameters: ethers.TransactionLike = {
       to,
       from: fromAddress,
-      value: "0x" + ethers.parseEther(value).toString(16),
+      value: BigInt(value),
       data: data || "0x",
     };
 
