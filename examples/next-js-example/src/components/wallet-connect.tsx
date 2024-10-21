@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { LogOut, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AvailableProvider, useWallet } from "web3-connect-react";
 
 export function WalletConnect() {
@@ -61,8 +61,8 @@ export function WalletConnect() {
   }, [sdk, isSignedIn]);
 
   return (
-    <div className="container mx-auto p-4">
-      <Card className="w-full max-w-4xl mx-auto">
+    <div className="container mx-auto">
+      <Card className="w-full mx-auto">
         <CardHeader>
           <CardTitle>Wallet Connection</CardTitle>
           <CardDescription>
@@ -91,9 +91,14 @@ export function WalletConnect() {
               .filter((p) => p.isVisible(false))
               .map((p) => (
                 <Card key={p.metadata.name}>
-                  <CardContent className="flex items-center justify-between p-4">
+                  <CardContent className="flex items-center justify-between p-4 flex-wrap">
                     <div>
-                      <h4 className="font-semibold">{p.metadata.name}</h4>
+                      <div className="font-semibold flex flex-row items-center space-x-2">
+                        <span> {p.metadata.name}</span>
+                        {React.cloneElement(p.metadata.image as any, {
+                          className: `!w-8 !h-8 bg-[${p.metadata.iconBackgroundColor}] rounded-lg p-1`,
+                        })}
+                      </div>
                       <p className="text-sm text-muted-foreground">
                         {p.metadata.description}
                       </p>
@@ -118,8 +123,11 @@ export function WalletConnect() {
           <div className={"mt-6"}>
             <h3 className="text-lg font-semibold mb-4">Wallet addresses</h3>
             <ol>
-              {addresses.map((address) => (
-                <li key={address.address}>
+              {addresses.map((address, index) => (
+                <li
+                  key={address.address ?? `unknown-${index}`}
+                  className={"break-all"}
+                >
                   <b>{address.chain}</b> {address.address}
                 </li>
               ))}

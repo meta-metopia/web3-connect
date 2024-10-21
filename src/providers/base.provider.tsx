@@ -37,7 +37,10 @@ function waitForEtherTransactionFinished(
       }
       setTimeout(checkTransaction, 1000);
     };
-    checkTransaction();
+    checkTransaction().catch((e) => {
+      console.error("Error checking transaction", e);
+      reject(e);
+    });
   });
 }
 
@@ -246,11 +249,14 @@ export class BaseProvider implements WalletProvider {
       data: data || "0x",
     };
 
+    console.log("transactionParameters", transactionParameters);
+
     try {
       const txHash = await this.provider.request({
         method: "eth_sendTransaction",
         params: [transactionParameters],
       });
+      console.log("txHash", txHash);
       await waitForEtherTransactionFinished(this.provider, txHash);
       return txHash;
     } catch (error) {
