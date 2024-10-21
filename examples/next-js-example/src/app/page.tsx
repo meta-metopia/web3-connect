@@ -12,7 +12,7 @@ export default function Home() {
   const { isSignedIn } = useWallet();
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 h-full min-h-full flex-1">
       <div className="max-w-7xl mx-auto grid grid-cols-3 gap-4">
         <div className={"col-span-1"}>
           <WalletConnect />

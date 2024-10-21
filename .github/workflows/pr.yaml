@@ -1,6 +1,8 @@
-name: Test and release
+name: Deploy docs
 on:
-  push:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   deploy-docs:
@@ -10,6 +12,7 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       SCOPE: ${{ secrets.SCOPE }}
+      PREVIEW_URL: ${{github.event.number}}.web3-connect.pagepreview.dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,23 +23,14 @@ jobs:
         with:
           version: latest
       - name: Build preview
-        run: pnpm i && pnpm build
+        run: pnpm i && pnpm build && cd examples/next-js-example
       - name: Deploy preview
-        run: ./scripts/deploy-prod.sh
+        run: ./scripts/deploy-preview.sh
         working-directory: examples/next-js-example
-        if: ${{ github.ref == 'refs/heads/main' }}
-  test:
-    if: ${{ github.event.pusher.name != 'github action' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: mshick/add-pr-comment@v2
         with:
-          version: latest
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
-      - run: pnpm install
-      - run: pnpm build
-      - run: pnpm test
+          message-id: preview-url
+          message: |
+            | Preview Name | Preview URL |
+            | --- | --- |
+            | Preview | [${{ env.PREVIEW_URL }}](https://${{ env.PREVIEW_URL }}) |
