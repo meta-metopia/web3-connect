@@ -4,6 +4,27 @@ on:
     types:
       - released
 jobs:
+  deploy-docs:
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Building project
+      - name: Get tag name and replace dots
+        run: |
+          TAG=$(echo ${{ github.event.release.tag_name }} | tr '.' '-')
+          echo "MODIFIED_TAG=$TAG" >> $GITHUB_ENV
+      - uses: amondnet/vercel-action@v25
+        name: Deploying Website
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.ORG_ID}}
+          vercel-project-id: ${{ secrets.PROJECT_ID }}
+          scope: ${{secrets.SCOPE}}
+          vercel-args: "--prod"
+          alias-domains: |
+            ${{ env.MODIFIED_TAG }}-web3-connect.pagepreview.dev
   release-npm:
     runs-on: ubuntu-latest
     env:
