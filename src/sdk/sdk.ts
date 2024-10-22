@@ -11,12 +11,14 @@ import {
   SignInOptions,
   SupportedChain,
   SwitchToNetworkOptions,
+  WalletConfig,
 } from "./sdk.interface";
 
 export class Sdk implements SdkInterface {
   private session: SessionResponse | undefined;
   constructor(
     private readonly providers: WalletProvider[],
+    private readonly walletConfig: WalletConfig,
     session: SessionResponse | undefined,
   ) {
     this.session = session;
@@ -47,8 +49,11 @@ export class Sdk implements SdkInterface {
     return provider;
   }
 
-  getBalance(): Promise<string> {
-    return this.provider.getBalance();
+  getBalance(...args: SupportedChain[]): Promise<string[]> {
+    return this.provider.getBalance({
+      chains: args,
+      walletConfig: this.walletConfig,
+    });
   }
 
   async getWalletAddress(
@@ -66,7 +71,10 @@ export class Sdk implements SdkInterface {
   }
 
   async sendTransaction(opts: SendTransactionOptions): Promise<string> {
-    return this.provider.sendTransaction(opts);
+    return this.provider.sendTransaction({
+      ...opts,
+      walletConfig: this.walletConfig,
+    });
   }
 
   get walletProviders(): WalletProvider[] {

@@ -6,6 +6,7 @@ import {
   DeployContractOptions,
   SendTransactionOptions,
   SupportedChain,
+  WalletConfig,
 } from "../sdk";
 
 export interface SignMessageOptions {
@@ -70,6 +71,16 @@ export interface MetaData {
   supportedChains: SupportedChain[];
 }
 
+export interface WalletProviderSendTransactionOptions
+  extends SendTransactionOptions {
+  walletConfig?: WalletConfig;
+}
+
+export interface WalletProviderGetBalanceOptions {
+  walletConfig?: WalletConfig;
+  chains: SupportedChain[];
+}
+
 export interface WalletProvider {
   /**
    * Get the current wallet address, if available
@@ -102,7 +113,7 @@ export interface WalletProvider {
    * const data = "0x..."; // Encoded contract method call
    * const txHash = await sendTransaction(opts);
    */
-  sendTransaction(opts: SendTransactionOptions): Promise<string>;
+  sendTransaction(opts: WalletProviderSendTransactionOptions): Promise<string>;
 
   /**
    * Call a specific method on a smart contract
@@ -130,7 +141,7 @@ export interface WalletProvider {
   /**
    * Get current wallet balance
    */
-  getBalance(): Promise<string>;
+  getBalance(opts: WalletProviderGetBalanceOptions): Promise<string[]>;
 
   /**
    * Switch to a different network

@@ -23,6 +23,7 @@ import {
   SignMessageOptions,
   VerifyMessageOptions,
   WalletProvider,
+  WalletProviderGetBalanceOptions,
 } from "../provider.interface";
 import { WalletConnectIcon } from "./WalletConnect.icon";
 
@@ -113,13 +114,13 @@ export class WalletConnectProvider implements WalletProvider {
   }
 
   // eslint-disable-next-line
-  async getBalance(): Promise<string> {
+  async getBalance(opts: WalletProviderGetBalanceOptions): Promise<string[]> {
     const provider = this.modal?.getWalletProvider();
-    const result = provider?.request({
+    const result = await provider?.request({
       method: "eth_getBalance",
       params: [this.modal?.getAddress(), "latest"],
     });
-    return result as Promise<string>;
+    return [result];
   }
   async switchNetwork(targetChainId: number): Promise<void> {
     await this.modal?.switchNetwork(targetChainId);

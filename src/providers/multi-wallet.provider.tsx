@@ -5,14 +5,18 @@ import {
   Transaction,
 } from "@solana/web3.js";
 import { arrayToHex } from "../common/address.utils";
+import { defaultConfig } from "../common/default-config/solana.default.config";
 import {
   CallContractMethodOptions,
   DeployContractOptions,
-  SendTransactionOptions,
   SupportedChain,
 } from "../sdk";
 import { BaseProvider } from "./base.provider";
-import { SignMessageOptions } from "./provider.interface";
+import {
+  SignMessageOptions,
+  WalletProviderGetBalanceOptions,
+  WalletProviderSendTransactionOptions,
+} from "./provider.interface";
 
 function waitForSolanaTransactionFinished(
   connection: Connection,
@@ -40,6 +44,36 @@ function waitForSolanaTransactionFinished(
 export class MultiWalletProvider extends BaseProvider {
   protected getSolanaProvider(): any {
     return this.globalWindow.multipleWallet.solana;
+  }
+
+  async getBalance(opts: WalletProviderGetBalanceOptions): Promise<string[]> {
+    return await Promise.all(
+      opts.chains.map(async (chain) => {
+        if (chain === "solana") {
+          const connection = new Connection(
+            opts.walletConfig.defaultChainConfigs.solana
+              ? opts.walletConfig.defaultChainConfigs.solana.rpcUrl
+              : defaultConfig.rpcUrl,
+          );
+          const [solanaAddress] = await this.getWalletAddress("solana");
+          const balance = await connection.getBalance(
+            new PublicKey(solanaAddress),
+          );
+          return balance.toString();
+        }
+
+        if (chain === "ethereum") {
+          const [ethAddress] = await this.getWalletAddress("ethereum");
+          const ethBalance = await this.provider.request({
+            method: "eth_getBalance",
+            params: [ethAddress, "latest"],
+          });
+          return ethBalance;
+        }
+
+        return "0";
+      }),
+    );
   }
 
   async getWalletAddress(...chains: SupportedChain[]): Promise<string[]> {
@@ -87,10 +121,16 @@ export class MultiWalletProvider extends BaseProvider {
     return super.signMessage(obj, opts);
   }
 
-  async sendTransaction(options: SendTransactionOptions): Promise<string> {
+  async sendTransaction(
+    options: WalletProviderSendTransactionOptions,
+  ): Promise<string> {
     if (options.chain === "solana") {
       const provider = this.getSolanaProvider();
-      const connection = new Connection(options.rpcUrl);
+      const connection = new Connection(
+        options.walletConfig.defaultChainConfigs.solana
+          ? options.walletConfig.defaultChainConfigs.solana.rpcUrl
+          : defaultConfig.rpcUrl,
+      );
       const [fromPubkey] = await this.getWalletAddress("solana");
       const toPubKey = new PublicKey(options.to);
       const transaction = new Transaction().add(

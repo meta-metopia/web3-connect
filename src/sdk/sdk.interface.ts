@@ -1,10 +1,17 @@
 import { SessionRequest, SessionResponse } from "../common";
 import { AvailableProvider } from "../common";
+import { SolanaDefaultConfig } from "../common/default-config/solana.default.config";
 import { WalletProvider } from "../providers";
 
 export type ConnectAction = "skip" | "continue";
 
 export type StatusCallback = (status: "sending" | "signing") => void;
+
+export interface WalletConfig {
+  defaultChainConfigs?: {
+    solana?: SolanaDefaultConfig;
+  };
+}
 
 export interface SwitchToNetworkOptions {
   chainId: number;
@@ -56,8 +63,6 @@ export interface SendTransactionOptions {
    * Data to send with the transaction
    */
   data?: string;
-
-  rpcUrl?: string;
 
   /**
    * Optional field to specify `send transaction` on a non-default blockchain.
@@ -232,7 +237,7 @@ export interface SdkInterface {
    * // Get the balance for multiple chains
    * const [ethBalance, solBalance] = await getBalance("evm", "solana");
    */
-  getBalance(...args: SupportedChain[]): Promise<string>;
+  getBalance(...args: SupportedChain[]): Promise<string[]>;
 
   /**
    * Send a transaction on the blockchain
