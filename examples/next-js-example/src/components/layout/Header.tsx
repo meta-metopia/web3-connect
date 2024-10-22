@@ -32,7 +32,7 @@ export default function Header() {
   return (
     <header
       className={
-        "h-16 p-2 border-b flex items-center space-x-4 sticky top-0 bg-white"
+        "h-16 p-2 border-b flex items-center space-x-4 sticky top-0 bg-white z-50"
       }
     >
       <div>
@@ -40,7 +40,7 @@ export default function Header() {
           <MenuIcon />
         </Button>
       </div>
-      <div>
+      <div className={"hidden sm:block"}>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>

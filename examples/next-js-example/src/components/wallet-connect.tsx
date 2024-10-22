@@ -61,8 +61,8 @@ export function WalletConnect() {
   }, [sdk, isSignedIn]);
 
   return (
-    <div className="container mx-auto">
-      <Card className="w-full mx-auto">
+    <div className="w-full">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Wallet Connection</CardTitle>
           <CardDescription>
@@ -72,7 +72,7 @@ export function WalletConnect() {
         <CardContent>
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">Current Provider</h3>
-            <div className="flex items-center justify-between bg-secondary p-3 rounded-md">
+            <div className="flex items-center justify-between bg-secondary p-3 rounded-md flex-wrap">
               <span>{sdk?.provider?.metadata.name || "None"}</span>
               {sdk.provider && (
                 <Button variant="outline" size="sm" onClick={handleSignOut}>
@@ -94,7 +94,7 @@ export function WalletConnect() {
                   sdk.provider?.metadata.name === p.metadata.name;
                 return (
                   <Card key={p.metadata.name}>
-                    <CardContent className="flex items-center justify-between p-4 flex-wrap">
+                    <CardContent className="flex items-center justify-between p-4 flex-wrap space-y-4">
                       <div>
                         <div className="font-semibold flex flex-row items-center space-x-2">
                           <span> {p.metadata.name}</span>
