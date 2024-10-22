@@ -14,10 +14,10 @@ export default function Home() {
   return (
     <div className="bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 h-full min-h-full flex-1">
       <div className="max-w-7xl mx-auto grid grid-cols-3 gap-4">
-        <div className={"col-span-1"}>
+        <div className={"col-span-3 md:col-span-1"}>
           <WalletConnect />
         </div>
-        <div className={"col-span-2"}>
+        <div className={"col-span-3 md:col-span-2"}>
           <AnimatePresence mode="wait">
             {isSignedIn && (
               <motion.div

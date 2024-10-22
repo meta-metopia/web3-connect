@@ -40,7 +40,7 @@ export default function Header() {
           <MenuIcon />
         </Button>
       </div>
-      <div>
+      <div className={"hidden sm:block"}>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
