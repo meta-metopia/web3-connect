@@ -34,6 +34,7 @@ jest.mock("@solana/web3.js", () => ({
     fromSecretKey: jest.fn(),
   },
   PublicKey: jest.fn(),
+  clusterApiUrl: jest.fn(),
 }));
 
 import { render, screen, waitFor } from "@testing-library/react";

@@ -1,6 +1,4 @@
 "use client";
-
-import { ethers } from "ethers";
 import {
   createContext,
   useCallback,
@@ -8,12 +6,13 @@ import {
   useMemo,
   useState,
 } from "react";
-import useSWR, { mutate } from "swr";
+import { mutate } from "swr";
 import { SessionResponse } from "../../common";
 import {
   MetaMaskMockProvider,
   Sdk,
   SwitchToNetworkOptions,
+  WalletConfig,
   WalletProvider,
 } from "../../sdk";
 
@@ -26,7 +25,6 @@ interface IWalletContext {
   session: SessionResponse;
   isSignedIn: boolean;
   isLoading: boolean;
-  balance: string;
   sdk: SdkInterface;
   chainId?: number;
   signIn: (
@@ -76,6 +74,11 @@ interface WalletProviderOptions {
    */
   listenToChainChanges?: boolean;
 
+  /**
+   * Wallet configuration
+   */
+  walletConfig?: WalletConfig;
+
   environment?: {
     env: "e2e";
     endpoint: string;
@@ -91,6 +94,7 @@ function WalletContextProvider({
   onSignedOut,
   listenToAccountChanges = true,
   listenToChainChanges = true,
+  walletConfig,
 }: WalletProviderOptions) {
   const [isSignedIn, setIsSignedIn] = useState(session.isAuth);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,21 +102,8 @@ function WalletContextProvider({
 
   const { isMobileDevice, globalWindow, isTest } = useEnvironment();
 
-  const { data: balance } = useSWR(
-    `/balance`,
-    async () => {
-      if (!isSignedIn) {
-        return "0";
-      }
-      return ethers.formatEther(await sdk.getBalance());
-    },
-    {
-      refreshInterval: 10_000,
-    },
-  );
-
   const sdk = useMemo(
-    () => new Sdk([], session),
+    () => new Sdk([], walletConfig, session),
     [globalWindow, isMobileDevice],
   );
 
@@ -217,7 +208,6 @@ function WalletContextProvider({
     session,
     isLoading,
     isSignedIn,
-    balance: balance ?? "0",
     sdk,
     chainId,
     signIn,

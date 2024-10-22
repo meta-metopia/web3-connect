@@ -168,7 +168,9 @@ describe("BaseProvider", () => {
   });
 
   it("should be able to get balance", async () => {
-    const balance = await walletProvider.getBalance();
+    const [balance] = await walletProvider.getBalance({
+      chains: ["ethereum"],
+    });
     expect(balance).toBe("0x0");
   });
 
@@ -326,7 +328,9 @@ describe("BaseProvider with VM", () => {
   });
 
   it("should get correct balance", async () => {
-    const balance = await provider.getBalance();
+    const [balance] = await provider.getBalance({
+      chains: ["ethereum"],
+    });
     expect(BigInt(balance)).toBe(BigInt(10000000000000000000));
   });
 

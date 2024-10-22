@@ -11,10 +11,11 @@ import {
 import { LogOut, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { AvailableProvider, useWallet } from "web3-connect-react";
+import { AvailableProvider, useBalance, useWallet } from "web3-connect-react";
 
 export function WalletConnect() {
   const { sdk, signIn, signOut, isSignedIn } = useWallet();
+  const { balance, isLoading, error } = useBalance("ethereum", "solana");
   const router = useRouter();
   const [addresses, setAddresses] = useState<
     {
@@ -59,6 +60,16 @@ export function WalletConnect() {
       })
       .catch(console.error);
   }, [sdk, isSignedIn]);
+
+  const getChainName = (index: number) => {
+    if (index === 0) {
+      return "ethereum";
+    }
+
+    return "solana";
+  };
+
+  console.log("balance", balance);
 
   return (
     <div className="w-full">
@@ -144,6 +155,20 @@ export function WalletConnect() {
                   className={"break-all"}
                 >
                   <b>{address.chain}</b> {address.address}
+                </li>
+              ))}
+            </ol>
+            <h3 className="text-lg font-semibold mb-4">Wallet Balance</h3>
+            <ol>
+              {error && <li>{error.message}</li>}
+              {balance?.map((balance, index) => (
+                <li
+                  key={`unknown-${
+                    // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                    index
+                  }`}
+                >
+                  {getChainName(index)}: {balance}
                 </li>
               ))}
             </ol>

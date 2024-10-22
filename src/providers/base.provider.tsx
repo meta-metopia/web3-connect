@@ -18,6 +18,7 @@ import {
   SignMessageOptions,
   VerifyMessageOptions,
   WalletProvider,
+  WalletProviderGetBalanceOptions,
 } from "./provider.interface";
 
 function waitForEtherTransactionFinished(
@@ -329,14 +330,18 @@ export class BaseProvider implements WalletProvider {
     }
   }
 
-  async getBalance(): Promise<string> {
+  async getBalance(opts: WalletProviderGetBalanceOptions): Promise<string[]> {
     if (this.provider === undefined) {
-      return "0";
+      return ["0"];
+    }
+
+    if (opts.chains.length === 0 || opts.chains[0] !== "ethereum") {
+      throw new Error("Chain not supported");
     }
 
     const accounts = await this.provider.request({ method: "eth_accounts" });
     if (accounts.length === 0) {
-      return "0";
+      return ["0"];
     }
 
     const balance = await this.provider.request({
@@ -344,7 +349,7 @@ export class BaseProvider implements WalletProvider {
       params: [accounts[0], "latest"],
     });
 
-    return balance;
+    return [balance];
   }
 
   async chainId(): Promise<number> {

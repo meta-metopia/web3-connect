@@ -57,8 +57,18 @@ describe("MetamaskMockProvider", () => {
   });
 
   it("Should be able to get balance", async () => {
-    const balance = await provider.getBalance();
+    const [balance] = await provider.getBalance({
+      chains: ["ethereum"],
+    });
     expect(balance).toEqual("0x0");
+  });
+
+  it("Should not be able to get balance", async () => {
+    await expect(() =>
+      provider.getBalance({
+        chains: ["solana"],
+      }),
+    ).rejects.toThrow();
   });
 
   it("should be able to get address", async () => {

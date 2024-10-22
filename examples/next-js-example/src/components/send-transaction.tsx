@@ -58,7 +58,6 @@ export default function SendTransaction() {
         to: values.recipient,
         value: values.amount,
         chain: selectedChain as any,
-        rpcUrl: "https://api.testnet.solana.com",
       })
       .then((hash) => {
         toast.success(`Transaction sent successfully! ${hash}`);
