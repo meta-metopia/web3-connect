@@ -10,19 +10,22 @@ import {
 } from "@/components/ui/card";
 import { LogOut, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { AvailableProvider, useBalance, useWallet } from "web3-connect-react";
+import React from "react";
+import {
+  AvailableProvider,
+  useAddresses,
+  useBalance,
+  useWallet,
+} from "web3-connect-react";
 
 export function WalletConnect() {
   const { sdk, signIn, signOut, isSignedIn } = useWallet();
   const { balance, isLoading, error } = useBalance("ethereum", "solana");
   const router = useRouter();
-  const [addresses, setAddresses] = useState<
-    {
-      address: string;
-      chain: string;
-    }[]
-  >([]);
+  const { addresses, isLoading: isAddressesLoading } = useAddresses(
+    "ethereum",
+    "solana",
+  );
 
   const handleSignOut = async () => {
     await signOut();
@@ -37,29 +40,6 @@ export function WalletConnect() {
       getSignInData: async () => {},
     });
   };
-
-  useEffect(() => {
-    if (!isSignedIn) {
-      setAddresses([]);
-    }
-    if (!sdk) return;
-    if (!sdk.provider) return;
-    sdk
-      .getWalletAddress("ethereum", "solana")
-      .then((addresses) => {
-        setAddresses([
-          {
-            address: addresses[0],
-            chain: "ethereum",
-          },
-          {
-            address: addresses[1],
-            chain: "solana",
-          },
-        ]);
-      })
-      .catch(console.error);
-  }, [sdk, isSignedIn]);
 
   const getChainName = (index: number) => {
     if (index === 0) {
@@ -149,14 +129,15 @@ export function WalletConnect() {
           <div className={"mt-6"}>
             <h3 className="text-lg font-semibold mb-4">Wallet addresses</h3>
             <ol>
-              {addresses.map((address, index) => (
-                <li
-                  key={address.address ?? `unknown-${index}`}
-                  className={"break-all"}
-                >
-                  <b>{address.chain}</b> {address.address}
-                </li>
-              ))}
+              {!isAddressesLoading &&
+                addresses.map((address, index) => (
+                  <li
+                    key={address ?? `unknown-${index}`}
+                    className={"break-all"}
+                  >
+                    <b>{getChainName(index)}</b> {address}
+                  </li>
+                ))}
             </ol>
             <h3 className="text-lg font-semibold mb-4">Wallet Balance</h3>
             <ol>
