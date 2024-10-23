@@ -176,7 +176,14 @@ export interface DeployContractOptions {
  * - `ethereum`: Ethereum or EVM compatible chains
  * - `solana`: Solana
  */
-export type SupportedChain = "ethereum" | "solana";
+export type SupportedChain =
+  | "ethereum"
+  | "solana"
+  | "optimism"
+  | "polygon"
+  | "arbitrum"
+  | "bnb"
+  | "avalanche-c";
 
 export interface SdkInterface {
   /**

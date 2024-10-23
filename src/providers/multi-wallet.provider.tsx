@@ -51,7 +51,7 @@ export class MultiWalletProvider extends BaseProvider {
       opts.chains.map(async (chain) => {
         if (chain === "solana") {
           const connection = new Connection(
-            opts.walletConfig.defaultChainConfigs.solana
+            opts.walletConfig?.defaultChainConfigs?.solana
               ? opts.walletConfig.defaultChainConfigs.solana.rpcUrl
               : defaultConfig.rpcUrl,
           );
@@ -61,17 +61,8 @@ export class MultiWalletProvider extends BaseProvider {
           );
           return balance.toString();
         }
-
-        if (chain === "ethereum") {
-          const [ethAddress] = await this.getWalletAddress("ethereum");
-          const ethBalance = await this.provider.request({
-            method: "eth_getBalance",
-            params: [ethAddress, "latest"],
-          });
-          return ethBalance;
-        }
-
-        return "0";
+        const [balance] = await this.getEthereumCompatibleChainsBalance(chain);
+        return balance;
       }),
     );
   }

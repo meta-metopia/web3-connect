@@ -2,6 +2,7 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { ethers } from "ethers";
 import { useContext } from "react";
 import useSWR from "swr";
+import { isEthereumCompatibleChain } from "../../common/isEthereumCompatibleChain";
 import { SupportedChain } from "../../sdk";
 import { WalletContext } from "./WalletContext";
 
@@ -33,13 +34,14 @@ export function useBalance(...chains: SupportedChain[]) {
 
       for (const index in balances) {
         const chain = chains[index];
-        if (chain === "ethereum") {
-          balances[index] = ethers.formatEther(balances[index]);
-        }
 
         if (chain === "solana") {
           // format solana balance
           balances[index] = lamportsToSol(balances[index] as any).toString();
+        }
+
+        if (isEthereumCompatibleChain(chain)) {
+          balances[index] = ethers.formatEther(balances[index]);
         }
       }
 
