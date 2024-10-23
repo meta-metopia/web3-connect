@@ -174,6 +174,20 @@ describe("BaseProvider", () => {
     expect(balance).toBe("0x0");
   });
 
+  it("should be able to get ethereum compatible chains' balance", async () => {
+    const balance = await walletProvider.getBalance({
+      chains: [
+        "ethereum",
+        "bnb",
+        "arbitrum",
+        "avalanche-c",
+        "polygon",
+        "optimism",
+      ],
+    });
+    expect(balance).toHaveLength(6);
+  });
+
   it("should be able to disconnect", async () => {
     await walletProvider.disconnect();
   });

@@ -5,6 +5,8 @@ import {
   hexToArray,
 } from "../common/address.utils";
 import { callContractMethod, deployContract } from "../common/contract.utils";
+import { rpcMap } from "../common/default-config/rpcMap";
+import { isEthereumCompatibleChain } from "../common/isEthereumCompatibleChain";
 import {
   CallContractMethodOptions,
   ConnectionResponse,
@@ -330,13 +332,39 @@ export class BaseProvider implements WalletProvider {
     }
   }
 
+  protected async getEthereumCompatibleChainsBalance(
+    ...chains: SupportedChain[]
+  ): Promise<string[]> {
+    const foundNotCompatibleChain = chains.find(
+      (chain) => !isEthereumCompatibleChain(chain),
+    );
+    if (foundNotCompatibleChain) {
+      throw new Error(`${foundNotCompatibleChain} is not supported`);
+    }
+
+    const [ethereum] = await this.getWalletAddress("ethereum");
+    return await Promise.all(
+      chains.map(async (chain) => {
+        if (chain === "ethereum") {
+          return await this.provider.request({
+            method: "eth_getBalance",
+            params: [ethereum, "latest"],
+          });
+        }
+        const rpc = rpcMap[chain];
+        const provider = new ethers.JsonRpcProvider(rpc);
+        return await provider.getBalance(ethereum);
+      }),
+    );
+  }
+
   async getBalance(opts: WalletProviderGetBalanceOptions): Promise<string[]> {
     if (this.provider === undefined) {
       return ["0"];
     }
 
-    if (opts.chains.length === 0 || opts.chains[0] !== "ethereum") {
-      throw new Error("Chain not supported");
+    if (opts.chains.length === 0) {
+      return this.getEthereumCompatibleChainsBalance("ethereum");
     }
 
     const accounts = await this.provider.request({ method: "eth_accounts" });
@@ -344,12 +372,7 @@ export class BaseProvider implements WalletProvider {
       return ["0"];
     }
 
-    const balance = await this.provider.request({
-      method: "eth_getBalance",
-      params: [accounts[0], "latest"],
-    });
-
-    return [balance];
+    return this.getEthereumCompatibleChainsBalance(...opts.chains);
   }
 
   async chainId(): Promise<number> {

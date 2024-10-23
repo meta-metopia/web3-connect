@@ -58,4 +58,11 @@ describe("sign message", () => {
     });
     expect(verifiedMessage).toBeTruthy();
   });
+
+  it.skip("should be able to get balance", async () => {
+    const balance = await walletProvider.getBalance({
+      chains: ["ethereum", "bnb", "arbitrum"],
+    });
+    expect(balance).toHaveLength(4);
+  });
 });

@@ -20,7 +20,12 @@ import {
 
 export function WalletConnect() {
   const { sdk, signIn, signOut, isSignedIn } = useWallet();
-  const { balance, isLoading, error } = useBalance("ethereum", "solana");
+  const { balance, isLoading, error } = useBalance(
+    "ethereum",
+    "solana",
+    "bnb",
+    "optimism",
+  );
   const router = useRouter();
   const { addresses, isLoading: isAddressesLoading } = useAddresses(
     "ethereum",
@@ -44,6 +49,26 @@ export function WalletConnect() {
   const getChainName = (index: number) => {
     if (index === 0) {
       return "ethereum";
+    }
+
+    if (index === 1) {
+      return "solana";
+    }
+
+    if (index === 2) {
+      return "optimism";
+    }
+
+    if (index === 3) {
+      return "polygon";
+    }
+
+    if (index === 4) {
+      return "arbitrum";
+    }
+
+    if (index === 5) {
+      return "bnb";
     }
 
     return "solana";
