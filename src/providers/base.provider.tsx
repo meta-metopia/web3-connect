@@ -284,6 +284,12 @@ export class BaseProvider implements WalletProvider {
     if (!fromAddress) {
       throw new Error("No wallet address found");
     }
+
+    let rpcUrl: string;
+    if (chain && chain !== "ethereum" && isEthereumCompatibleChain(chain)) {
+      rpcUrl = rpcMap[chain];
+    }
+
     return deployContract({
       provider: this.provider,
       abi,
@@ -291,6 +297,7 @@ export class BaseProvider implements WalletProvider {
       fromAddress,
       params,
       value,
+      rpcUrl: rpcUrl,
     });
   }
 
@@ -306,13 +313,18 @@ export class BaseProvider implements WalletProvider {
       throw new Error("Provider not found");
     }
 
-    if (chain && chain !== "ethereum") {
+    if (chain && !isEthereumCompatibleChain(chain)) {
       throw new Error(`${chain} is not supported by this provider`);
     }
 
     const [fromAddress] = await this.getWalletAddress();
     if (!fromAddress) {
       throw new Error("No wallet address found");
+    }
+
+    let rpcUrl: string;
+    if (chain && chain !== "ethereum") {
+      rpcUrl = rpcMap[chain];
     }
 
     return callContractMethod({
@@ -323,6 +335,7 @@ export class BaseProvider implements WalletProvider {
       fromAddress,
       params,
       value,
+      rpcUrl: rpcUrl,
     });
   }
 

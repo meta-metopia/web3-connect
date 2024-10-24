@@ -1,6 +1,7 @@
 "use client";
 
-import { ContractInteract } from "@/components/contract-interact";
+import { DeployContract } from "@/components/deploy-contract";
+import InteractContract from "@/components/interact-contract";
 import SendTransaction from "@/components/send-transaction";
 import SignMessageExample from "@/components/sign-message";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -27,15 +28,21 @@ export default function Home() {
                 transition={{ duration: 0.5 }}
               >
                 <Tabs
-                  defaultValue={"smart-contract"}
+                  defaultValue={"deploy-contract"}
                   className="bg-white border rounded-xl overflow-hidden"
                 >
                   <TabsList className="m-5">
                     <TabsTrigger
-                      value="smart-contract"
+                      value="deploy-contract"
                       className="px-4 py-2 rounded-md"
                     >
-                      Interact with Contract
+                      Deploy contract
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="interact-contract"
+                      className="px-4 py-2 rounded-md"
+                    >
+                      Interact contract
                     </TabsTrigger>
                     <TabsTrigger
                       value="transactions"
@@ -50,8 +57,11 @@ export default function Home() {
                       Sign Message
                     </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="smart-contract" className="p-6">
-                    <ContractInteract />
+                  <TabsContent value="deploy-contract" className="p-6">
+                    <DeployContract />
+                  </TabsContent>
+                  <TabsContent value="interact-contract" className="p-6">
+                    <InteractContract />
                   </TabsContent>
                   <TabsContent value="transactions" className="p-6">
                     <SendTransaction />

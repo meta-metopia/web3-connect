@@ -10,7 +10,7 @@ import { useWallet } from "web3-connect-react";
 
 const contractStorageKey = "contractAddress";
 
-export function ContractInteract() {
+export function DeployContract() {
   const { sdk } = useWallet();
   const [value, setValue] = useState<string>("");
   const [currentBalance, setCurrentBalance] = useState<string>("");
@@ -31,6 +31,7 @@ export function ContractInteract() {
           bytecode,
         })
         .finally(() => setIsDeploying(false));
+      console.log("deployed contract at", address);
       sessionStorage.setItem(contractStorageKey, address);
       setContractAddress(address);
     } catch (error: any) {
@@ -57,7 +58,7 @@ export function ContractInteract() {
         method: "balanceOf",
         params: [walletAddress],
       });
-      setCurrentBalance(result);
+      setCurrentBalance(result.toString());
     } catch (error: any) {
       console.error(error);
       alert(error.message);
