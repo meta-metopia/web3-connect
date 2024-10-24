@@ -74,8 +74,6 @@ export function WalletConnect() {
     return "solana";
   };
 
-  console.log("balance", balance);
-
   return (
     <div className="w-full">
       <Card className="w-full">
