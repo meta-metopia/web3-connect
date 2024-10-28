@@ -1,11 +1,32 @@
+import {
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import { SessionRequest, SessionResponse } from "../common";
 import { AvailableProvider } from "../common";
 import { SolanaDefaultConfig } from "../common/default-config/solana.default.config";
 import { WalletProvider } from "../providers";
+import {Structure} from "@solana/buffer-layout";
 
 export type ConnectAction = "skip" | "continue";
 
 export type StatusCallback = (status: "sending" | "signing") => void;
+
+export interface SolanaProvider {
+  signMessage: (
+    message: Uint8Array,
+    encoding?: string,
+  ) => Promise<{
+    signature: Uint8Array;
+  }>;
+  connect: () => Promise<{
+    publicKey: PublicKey;
+  }>;
+  signAndSendTransaction: (tx: Transaction) => Promise<{
+    signature: string;
+  }>;
+}
 
 export interface WalletConfig {
   defaultChainConfigs?: {
@@ -87,7 +108,7 @@ export interface SendTransactionOptions {
   chain?: SupportedChain;
 }
 
-export interface CallContractMethodOptions {
+export interface CallEVMContractMethodOptions {
   /**
    * Contract address
    */
@@ -128,8 +149,23 @@ export interface CallContractMethodOptions {
    *
    * @default "ethereum"
    */
-  chain?: SupportedChain;
+  chain?: Exclude<SupportedChain, "solana">;
 }
+
+export interface CallSolanaContractMethodOptions {
+  contractAddress: string;
+  method: number;
+  chain: "solana";
+  params?: any[];
+  value?: string;
+  layout?: Structure<any>; // Optional buffer layout
+  accounts?: Record<string, PublicKey>;
+  instructions?: TransactionInstruction[];
+}
+
+export type CallContractMethodOptions =
+  | CallEVMContractMethodOptions
+  | CallSolanaContractMethodOptions;
 
 export interface DeployContractOptions {
   /**

@@ -26,6 +26,9 @@
   },
   "scripts": {
     "test": "jest --passWithNoTests",
+    "validator:start": "solana-test-validator --reset --quiet",
+    "validator:stop": "pkill solana-test-validator || true",
+    "test:ci": "start-server-and-test validator:start http://localhost:8899/health test validator:stop",
     "format": "biome format --write .",
     "build": "rm -rf dist && tsc",
     "prepublish": "pnpm build"
@@ -36,6 +39,8 @@
   "dependencies": {
     "@biomejs/biome": "^1.9.3",
     "@ethereumjs/tx": "^5.4.0",
+    "@solana/buffer-layout": "^4.0.1",
+    "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "^1.95.4",
     "@types/jest": "^29.5.13",
     "@types/react": "^18.3.11",

@@ -9,14 +9,16 @@ import { ethers } from "ethers";
 import {
   callContractMethod,
   deployContract,
-} from "../../common/contract.utils";
+} from "../../common/contract/contract.evm.utils";
 import {
   CallContractMethodOptions,
+  CallEVMContractMethodOptions,
   ConnectionResponse,
   DeployContractOptions,
   EIP1193Provider,
   SendTransactionOptions,
   SupportedChain,
+  WalletConfig,
 } from "../../sdk";
 import {
   MetaData,
@@ -32,7 +34,7 @@ export class WalletConnectProvider implements WalletProvider {
   private hasSignedIn = false;
   private isEnable = false;
 
-  constructor(_: any, options: Web3ModalOptions) {
+  constructor(_: any, config: WalletConfig, options: Web3ModalOptions) {
     try {
       this.modal = createWeb3Modal(options);
       this.getWalletAddress().then((address) => {
@@ -211,13 +213,7 @@ export class WalletConnectProvider implements WalletProvider {
     throw new Error("Method not implemented.");
   }
 
-  async callContractMethod({
-    contractAddress,
-    abi,
-    method,
-    params = [],
-    value,
-  }: CallContractMethodOptions): Promise<string> {
+  async callContractMethod(opts: CallContractMethodOptions): Promise<string> {
     if (this.getProvider() === undefined) {
       throw new Error("Provider not found");
     }
@@ -227,10 +223,12 @@ export class WalletConnectProvider implements WalletProvider {
       throw new Error("No wallet address found");
     }
 
+    const { contractAddress, method, value, params } = opts;
+
     return callContractMethod({
       provider: this.getProvider(),
       contractAddress,
-      abi,
+      abi: (opts as CallEVMContractMethodOptions).abi,
       methodName: method,
       fromAddress,
       params,

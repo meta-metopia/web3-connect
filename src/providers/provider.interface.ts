@@ -71,11 +71,6 @@ export interface MetaData {
   supportedChains: SupportedChain[];
 }
 
-export interface WalletProviderSendTransactionOptions
-  extends SendTransactionOptions {
-  walletConfig?: WalletConfig;
-}
-
 export interface WalletProviderGetBalanceOptions {
   walletConfig?: WalletConfig;
   chains: SupportedChain[];
@@ -113,7 +108,7 @@ export interface WalletProvider {
    * const data = "0x..."; // Encoded contract method call
    * const txHash = await sendTransaction(opts);
    */
-  sendTransaction(opts: WalletProviderSendTransactionOptions): Promise<string>;
+  sendTransaction(opts: SendTransactionOptions): Promise<string>;
 
   /**
    * Call a specific method on a smart contract
