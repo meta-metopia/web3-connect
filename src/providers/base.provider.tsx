@@ -20,6 +20,7 @@ import {
   WalletConfig,
 } from "../sdk";
 import {
+  CallRequest,
   EIP1193Provider,
   MetaData,
   SignMessageOptions,
@@ -67,7 +68,7 @@ export class BaseProvider implements WalletProvider {
 
   constructor(
     protected readonly globalWindow: any,
-    protected readonly options: WalletConfig,
+    protected readonly options?: WalletConfig,
   ) {}
 
   init() {}
@@ -412,5 +413,12 @@ export class BaseProvider implements WalletProvider {
 
   isVisible(isMobile: boolean): boolean {
     return isMobile ? this.isEnabled() : true;
+  }
+
+  request(opts: CallRequest): Promise<any> {
+    return this.provider.request({
+      method: opts.method,
+      params: opts.params,
+    });
   }
 }

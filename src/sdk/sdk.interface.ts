@@ -1,3 +1,4 @@
+import { Structure } from "@solana/buffer-layout";
 import {
   PublicKey,
   Transaction,
@@ -7,7 +8,6 @@ import { SessionRequest, SessionResponse } from "../common";
 import { AvailableProvider } from "../common";
 import { SolanaDefaultConfig } from "../common/default-config/solana.default.config";
 import { WalletProvider } from "../providers";
-import {Structure} from "@solana/buffer-layout";
 
 export type ConnectAction = "skip" | "continue";
 
@@ -163,9 +163,7 @@ export interface CallSolanaContractMethodOptions {
   instructions?: TransactionInstruction[];
 }
 
-export type CallContractMethodOptions =
-  | CallEVMContractMethodOptions
-  | CallSolanaContractMethodOptions;
+export type CallContractMethodOptions = CallEVMContractMethodOptions;
 
 export interface DeployContractOptions {
   /**

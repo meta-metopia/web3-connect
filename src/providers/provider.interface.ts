@@ -48,6 +48,12 @@ export interface EIP1193Provider {
   on: (event: string, callback: (event: any) => void) => void;
 }
 
+export interface CallRequest {
+  chain: SupportedChain;
+  params: any[];
+  method: string;
+}
+
 export type EIP6963AnnounceProviderEvent = {
   detail: {
     info: EIP6963ProviderInfo;
@@ -188,6 +194,8 @@ export interface WalletProvider {
    * @param opts The message to verify
    */
   verifyMessage(opts: VerifyMessageOptions): Promise<boolean>;
+
+  request(opts: CallRequest): Promise<any>;
 
   metadata: MetaData;
 }

@@ -1,6 +1,17 @@
-import { Keypair } from "@solana/web3.js";
+import {
+  createMint,
+  getOrCreateAssociatedTokenAccount,
+  mintTo,
+} from "@solana/spl-token";
+import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import nacl from "tweetnacl";
+import { createFundedKeypair, getTestConnection } from "../setupTests";
 import { MultiWalletProvider } from "./multi-wallet.provider";
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 describe("sign message", () => {
   let walletProvider: MultiWalletProvider;
@@ -64,5 +75,67 @@ describe("sign message", () => {
       chains: ["ethereum", "bnb", "arbitrum"],
     });
     expect(balance).toHaveLength(4);
+  });
+});
+
+describe("should be able to request on solana", () => {
+  let connection: Connection;
+  let payer: Keypair;
+  let mintAuthority: Keypair;
+  let freezeAuthority: Keypair;
+  let mint: PublicKey;
+  let walletProvider: MultiWalletProvider;
+
+  beforeAll(async () => {
+    connection = getTestConnection();
+    payer = await createFundedKeypair(connection);
+    mintAuthority = await createFundedKeypair(connection);
+    freezeAuthority = await createFundedKeypair(connection);
+
+    walletProvider = new MultiWalletProvider(
+      {},
+      {
+        defaultChainConfigs: {
+          solana: {
+            rpcUrl: "http://localhost:8899",
+          },
+        },
+      },
+    );
+
+    // Create the mint
+    mint = await createMint(
+      connection,
+      payer,
+      mintAuthority.publicKey,
+      freezeAuthority.publicKey,
+      9,
+    );
+  });
+
+  it.skip("should be able to request all accounts", async () => {
+    // create associated token account
+    const tokenInfo = await getOrCreateAssociatedTokenAccount(
+      connection,
+      payer,
+      mint,
+      payer.publicKey,
+    );
+    await mintTo(
+      connection,
+      payer,
+      mint,
+      tokenInfo.address,
+      mintAuthority,
+      1000,
+    );
+    const address = getAssociatedTokenAddressSync(mint, payer.publicKey);
+    const result = await walletProvider.request({
+      method: "getTokenAccountBalance",
+      params: [address.toBase58()],
+      chain: "solana",
+    });
+    console.log(result);
+    expect(result).toBeDefined();
   });
 });

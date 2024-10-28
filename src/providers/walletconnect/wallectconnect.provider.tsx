@@ -21,6 +21,7 @@ import {
   WalletConfig,
 } from "../../sdk";
 import {
+  CallRequest,
   MetaData,
   SignMessageOptions,
   VerifyMessageOptions,
@@ -294,5 +295,9 @@ export class WalletConnectProvider implements WalletProvider {
       console.error("Error sending transaction:", error);
       throw error;
     }
+  }
+
+  request(opts: CallRequest): Promise<any> {
+    throw new Error("Method not implemented.");
   }
 }

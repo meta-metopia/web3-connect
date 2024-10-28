@@ -4,11 +4,9 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
+import axios from "axios";
 import { arrayToHex } from "../common/address.utils";
-import {
-  callSolanaProgram,
-  waitForSolanaTransactionFinished,
-} from "../common/contract/contract.solana.utils";
+import { waitForSolanaTransactionFinished } from "../common/contract/contract.solana.utils";
 import { defaultConfig } from "../common/default-config/solana.default.config";
 import {
   CallContractMethodOptions,
@@ -19,6 +17,7 @@ import {
 } from "../sdk";
 import { BaseProvider } from "./base.provider";
 import {
+  CallRequest,
   SignMessageOptions,
   WalletProviderGetBalanceOptions,
 } from "./provider.interface";
@@ -131,15 +130,31 @@ export class MultiWalletProvider extends BaseProvider {
     return super.deployContract(options);
   }
 
+  async request(opts: CallRequest): Promise<any> {
+    if (opts.chain === "solana") {
+      // make a raw request to the provider
+      const connection = this.getSolanaConnection();
+      const data = await axios.post(connection.rpcEndpoint, {
+        jsonrpc: "2.0",
+        id: 1,
+        method: opts.method,
+        params: opts.params,
+      });
+      if (data.data.error) {
+        throw new Error(data.data.error.message);
+      }
+      return data.data.result;
+    }
+
+    return super.request(opts);
+  }
+
   async callContractMethod(
     options: CallContractMethodOptions,
   ): Promise<string> {
+    //@ts-expect-error
     if (options.chain === "solana") {
-      return callSolanaProgram({
-        ...options,
-        connection: this.getSolanaConnection(),
-        provider: this.getSolanaProvider(),
-      });
+      throw new Error("Solana is not supported.");
     }
     return super.callContractMethod(options);
   }
