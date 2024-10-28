@@ -4,45 +4,26 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
+import axios from "axios";
 import { arrayToHex } from "../common/address.utils";
+import { waitForSolanaTransactionFinished } from "../common/contract/contract.solana.utils";
 import { defaultConfig } from "../common/default-config/solana.default.config";
 import {
   CallContractMethodOptions,
   DeployContractOptions,
+  SendTransactionOptions,
+  SolanaProvider,
   SupportedChain,
 } from "../sdk";
 import { BaseProvider } from "./base.provider";
 import {
+  CallRequest,
   SignMessageOptions,
   WalletProviderGetBalanceOptions,
-  WalletProviderSendTransactionOptions,
 } from "./provider.interface";
 
-function waitForSolanaTransactionFinished(
-  connection: Connection,
-  signature: string,
-) {
-  return new Promise((resolve, reject) => {
-    const checkSignature = async () => {
-      const { value } = await connection.getSignatureStatus(signature);
-      const confirmationStatus = value?.confirmationStatus;
-      if (confirmationStatus) {
-        const hasReachedSufficientCommitment =
-          confirmationStatus === "confirmed" ||
-          confirmationStatus === "finalized";
-        if (hasReachedSufficientCommitment) {
-          resolve(void 0);
-          return;
-        }
-      }
-      setTimeout(checkSignature, 1000);
-    };
-    checkSignature();
-  });
-}
-
 export class MultiWalletProvider extends BaseProvider {
-  protected getSolanaProvider(): any {
+  protected getSolanaProvider(): SolanaProvider {
     return this.globalWindow.multipleWallet.solana;
   }
 
@@ -85,7 +66,7 @@ export class MultiWalletProvider extends BaseProvider {
     }
 
     if (hasSol) {
-      const solanaWallet = await this.getSolanaProvider();
+      const solanaWallet = this.getSolanaProvider();
       const address = await solanaWallet.connect();
       addresses.push(address.publicKey.toString());
     }
@@ -112,16 +93,16 @@ export class MultiWalletProvider extends BaseProvider {
     return super.signMessage(obj, opts);
   }
 
-  async sendTransaction(
-    options: WalletProviderSendTransactionOptions,
-  ): Promise<string> {
+  private getSolanaConnection(): Connection {
+    return new Connection(
+      this.options.defaultChainConfigs?.solana?.rpcUrl ?? defaultConfig.rpcUrl,
+    );
+  }
+
+  async sendTransaction(options: SendTransactionOptions): Promise<string> {
     if (options.chain === "solana") {
       const provider = this.getSolanaProvider();
-      const connection = new Connection(
-        options.walletConfig.defaultChainConfigs.solana
-          ? options.walletConfig.defaultChainConfigs.solana.rpcUrl
-          : defaultConfig.rpcUrl,
-      );
+      const connection = this.getSolanaConnection();
       const [fromPubkey] = await this.getWalletAddress("solana");
       const toPubKey = new PublicKey(options.to);
       const transaction = new Transaction().add(
@@ -149,11 +130,31 @@ export class MultiWalletProvider extends BaseProvider {
     return super.deployContract(options);
   }
 
+  async request(opts: CallRequest): Promise<any> {
+    if (opts.chain === "solana") {
+      // make a raw request to the provider
+      const connection = this.getSolanaConnection();
+      const data = await axios.post(connection.rpcEndpoint, {
+        jsonrpc: "2.0",
+        id: 1,
+        method: opts.method,
+        params: opts.params,
+      });
+      if (data.data.error) {
+        throw new Error(data.data.error.message);
+      }
+      return data.data.result;
+    }
+
+    return super.request(opts);
+  }
+
   async callContractMethod(
     options: CallContractMethodOptions,
   ): Promise<string> {
+    //@ts-expect-error
     if (options.chain === "solana") {
-      throw new Error("Not supported");
+      throw new Error("Solana is not supported.");
     }
     return super.callContractMethod(options);
   }

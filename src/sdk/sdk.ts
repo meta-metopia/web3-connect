@@ -71,10 +71,7 @@ export class Sdk implements SdkInterface {
   }
 
   async sendTransaction(opts: SendTransactionOptions): Promise<string> {
-    return this.provider.sendTransaction({
-      ...opts,
-      walletConfig: this.walletConfig,
-    });
+    return this.provider.sendTransaction(opts);
   }
 
   get walletProviders(): WalletProvider[] {

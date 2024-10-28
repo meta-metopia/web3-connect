@@ -116,7 +116,9 @@ function WalletContextProvider({
       // to avoid this error.
 
       for (const provider of providers ?? []) {
-        sdk.registerProvider(new provider(globalWindow, walletConnectConfig));
+        sdk.registerProvider(
+          new provider(globalWindow, walletConfig, walletConnectConfig),
+        );
       }
 
       // If the environment is e2e, use the mock provider

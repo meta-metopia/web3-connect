@@ -2,9 +2,7 @@
   "name": "web3-connect-react",
   "version": "0.0.13",
   "description": "",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "publishConfig": {
     "access": "public"
   },
@@ -26,6 +24,8 @@
   },
   "scripts": {
     "test": "jest --passWithNoTests",
+    "validator:start": "solana-test-validator --reset &",
+    "validator:stop": "pkill solana-test-validator || true",
     "format": "biome format --write .",
     "build": "rm -rf dist && tsc",
     "prepublish": "pnpm build"
@@ -36,12 +36,15 @@
   "dependencies": {
     "@biomejs/biome": "^1.9.3",
     "@ethereumjs/tx": "^5.4.0",
+    "@solana/buffer-layout": "^4.0.1",
+    "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "^1.95.4",
     "@types/jest": "^29.5.13",
     "@types/react": "^18.3.11",
     "@types/ua-parser-js": "^0.7.39",
     "@web3modal/ethers": "^4.2.3",
     "@web3modal/scaffold-utils": "^4.2.3",
+    "axios": "^1.7.7",
     "ethers": "^6.13.4",
     "jose": "^5.9.4",
     "pino-pretty": "^11.3.0",

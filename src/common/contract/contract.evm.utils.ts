@@ -1,6 +1,6 @@
 import { BrowserProvider, ethers } from "ethers";
-import { EIP1193Provider } from "../providers";
-import { SupportedChain } from "../sdk";
+import { EIP1193Provider } from "../../providers";
+import { SupportedChain } from "../../sdk";
 
 interface CallContractMethodParams {
   provider: EIP1193Provider;

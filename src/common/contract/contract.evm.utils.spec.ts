@@ -3,7 +3,7 @@ import { Account, bytesToHex } from "@ethereumjs/util";
 import { VM } from "@ethereumjs/vm";
 import { ethers } from "ethers";
 import solc from "solc";
-import { callContractMethod, deployContract } from "./contract.utils"; // Replace with the actual import path
+import { callContractMethod, deployContract } from "./contract.evm.utils"; // Replace with the actual import path
 
 const originalFetch = global.fetch;
 

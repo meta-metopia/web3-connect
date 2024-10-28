@@ -48,6 +48,12 @@ export interface EIP1193Provider {
   on: (event: string, callback: (event: any) => void) => void;
 }
 
+export interface CallRequest {
+  chain: SupportedChain;
+  params: any[];
+  method: string;
+}
+
 export type EIP6963AnnounceProviderEvent = {
   detail: {
     info: EIP6963ProviderInfo;
@@ -69,11 +75,6 @@ export interface MetaData {
   notInstalledText: string;
   iconBackgroundColor?: string;
   supportedChains: SupportedChain[];
-}
-
-export interface WalletProviderSendTransactionOptions
-  extends SendTransactionOptions {
-  walletConfig?: WalletConfig;
 }
 
 export interface WalletProviderGetBalanceOptions {
@@ -113,7 +114,7 @@ export interface WalletProvider {
    * const data = "0x..."; // Encoded contract method call
    * const txHash = await sendTransaction(opts);
    */
-  sendTransaction(opts: WalletProviderSendTransactionOptions): Promise<string>;
+  sendTransaction(opts: SendTransactionOptions): Promise<string>;
 
   /**
    * Call a specific method on a smart contract
@@ -193,6 +194,8 @@ export interface WalletProvider {
    * @param opts The message to verify
    */
   verifyMessage(opts: VerifyMessageOptions): Promise<boolean>;
+
+  request(opts: CallRequest): Promise<any>;
 
   metadata: MetaData;
 }

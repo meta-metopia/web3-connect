@@ -4,3 +4,4 @@ dist
 .idea
 .DS_Store
 examples/next-js-example/src/lib/gitVersions.ts
+test-ledger

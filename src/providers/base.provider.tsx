@@ -4,17 +4,23 @@ import {
   convertSolanaAddressStringToUint8Array,
   hexToArray,
 } from "../common/address.utils";
-import { callContractMethod, deployContract } from "../common/contract.utils";
+import {
+  callContractMethod,
+  deployContract,
+} from "../common/contract/contract.evm.utils";
 import { rpcMap } from "../common/default-config/rpcMap";
 import { isEthereumCompatibleChain } from "../common/isEthereumCompatibleChain";
 import {
   CallContractMethodOptions,
+  CallEVMContractMethodOptions,
   ConnectionResponse,
   DeployContractOptions,
   SendTransactionOptions,
   SupportedChain,
+  WalletConfig,
 } from "../sdk";
 import {
+  CallRequest,
   EIP1193Provider,
   MetaData,
   SignMessageOptions,
@@ -60,7 +66,10 @@ export class BaseProvider implements WalletProvider {
   rdns = "test.base";
   provider: EIP1193Provider | undefined;
 
-  constructor(protected readonly globalWindow: any) {}
+  constructor(
+    protected readonly globalWindow: any,
+    protected readonly options?: WalletConfig,
+  ) {}
 
   init() {}
 
@@ -301,19 +310,14 @@ export class BaseProvider implements WalletProvider {
     });
   }
 
-  async callContractMethod({
-    contractAddress,
-    abi,
-    method,
-    params = [],
-    value = "0",
-    chain,
-  }: CallContractMethodOptions): Promise<string> {
+  async callContractMethod(opts: CallContractMethodOptions): Promise<string> {
     if (this.provider === undefined) {
       throw new Error("Provider not found");
     }
 
-    if (chain && !isEthereumCompatibleChain(chain)) {
+    const { chain, method, contractAddress, params, value } = opts;
+
+    if (opts.chain && !isEthereumCompatibleChain(chain)) {
       throw new Error(`${chain} is not supported by this provider`);
     }
 
@@ -330,7 +334,7 @@ export class BaseProvider implements WalletProvider {
     return callContractMethod({
       provider: this.provider,
       contractAddress,
-      abi,
+      abi: (opts as CallEVMContractMethodOptions).abi,
       methodName: method,
       fromAddress,
       params,
@@ -409,5 +413,12 @@ export class BaseProvider implements WalletProvider {
 
   isVisible(isMobile: boolean): boolean {
     return isMobile ? this.isEnabled() : true;
+  }
+
+  request(opts: CallRequest): Promise<any> {
+    return this.provider.request({
+      method: opts.method,
+      params: opts.params,
+    });
   }
 }
