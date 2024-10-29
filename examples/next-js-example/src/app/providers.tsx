@@ -19,10 +19,12 @@ export function Providers({ children }: { children: ReactNode }) {
       }}
       session={parsedSession}
       providers={[MetaMaskProvider, OKXProvider, PhantomProvider]}
+      listenToChainChanges={false}
+      listenToAccountChanges={false}
       walletConfig={{
         defaultChainConfigs: {
           solana: {
-            rpcUrl: "https://api.testnet.solana.com",
+            rpcUrl: "https://api.devnet.solana.com",
           },
         },
       }}

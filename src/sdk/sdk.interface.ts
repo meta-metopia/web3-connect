@@ -8,6 +8,7 @@ import { SessionRequest, SessionResponse } from "../common";
 import { AvailableProvider } from "../common";
 import { SolanaDefaultConfig } from "../common/default-config/solana.default.config";
 import { WalletProvider } from "../providers";
+import { CallRequest } from "../providers/provider.interface";
 
 export type ConnectAction = "skip" | "continue";
 
@@ -328,6 +329,12 @@ export interface SdkInterface {
    *  });
    */
   deployContract(opts: DeployContractOptions): Promise<string>;
+
+  /**
+   * Make a raw rpc request to the blockchain
+   * @param callMethod
+   */
+  request(callMethod: CallRequest): Promise<any>;
 
   provider: WalletProvider;
 

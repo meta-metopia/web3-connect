@@ -1,4 +1,8 @@
-import { useAddresses, useWallet } from "web3-connect-react";
+import {
+  useAddresses,
+  useSplWalletBalance,
+  useWallet,
+} from "web3-connect-react";
 import abi from "./abi.json";
 
 const contract = "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d";
@@ -9,6 +13,9 @@ const contract = "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d";
  * @constructor
  */
 export default function InteractContract() {
+  const { balance } = useSplWalletBalance(
+    "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr",
+  );
   const getContractMethods = (abi: any) => {
     return abi.filter((method: any) => method.type === "function");
   };
@@ -31,12 +38,13 @@ export default function InteractContract() {
       contractAddress: contract,
       chain: "bnb",
     });
-    console.log(result);
   };
 
   return (
     <div>
       <button onClick={getBalance}>Get balance</button>
+      <br />
+      <span>Balance: {balance}</span>
     </div>
   );
 }

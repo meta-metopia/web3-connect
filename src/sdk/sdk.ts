@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { SessionResponse } from "../common";
 import { AvailableProvider } from "../common";
 import { WalletProvider } from "../providers";
+import { CallRequest } from "../providers/provider.interface";
 import {
   CallContractMethodOptions,
   ConnectionResponse,
@@ -211,6 +212,10 @@ export class Sdk implements SdkInterface {
         console.error("Failed to add network");
       });
     await this.provider.switchNetwork(opts.chainId);
+  }
+
+  async request(options: CallRequest) {
+    return this.provider.request(options);
   }
 
   onChainChanged(callback: (chainId: number) => void): void {
