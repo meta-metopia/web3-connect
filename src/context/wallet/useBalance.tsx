@@ -15,7 +15,7 @@ export const lamportsToSol = (lamports: number | string) => {
  * @param chains The list of supported chains
  */
 export function useBalance(...chains: SupportedChain[]) {
-  const { sdk, isSignedIn, options } = useContext(WalletContext);
+  const { sdk, isSignedIn } = useContext(WalletContext);
   const {
     data: balance,
     error,
@@ -49,10 +49,7 @@ export function useBalance(...chains: SupportedChain[]) {
     },
     {
       // should not revalidate if the user chooses not to listen to account changes
-      refreshInterval: options.listenToAccountChanges ? 10_000 : 0,
-      refreshWhenOffline: options.listenToAccountChanges,
-      revalidateOnFocus: options.listenToAccountChanges,
-      revalidateOnReconnect: options.listenToAccountChanges,
+      refreshInterval: 10_000,
     },
   );
 
