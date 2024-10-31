@@ -33,6 +33,7 @@ interface IWalletContext {
   ) => Promise<void>;
   signOut: () => Promise<void>;
   switchNetwork: (network: SwitchToNetworkOptions) => Promise<void>;
+  options: WalletProviderOptions;
 }
 
 const WalletContext = createContext<IWalletContext>({} as any);
@@ -85,20 +86,22 @@ interface WalletProviderOptions {
   };
 }
 
-function WalletContextProvider({
-  children,
-  session,
-  walletConnectConfig,
-  providers,
-  environment,
-  onSignedOut,
-  listenToAccountChanges = true,
-  listenToChainChanges = true,
-  walletConfig,
-}: WalletProviderOptions) {
+function WalletContextProvider(props: WalletProviderOptions) {
+  const {
+    children,
+    session,
+    walletConnectConfig,
+    providers,
+    environment,
+    onSignedOut,
+    listenToAccountChanges = true,
+    listenToChainChanges = true,
+    walletConfig,
+  } = props;
   const [isSignedIn, setIsSignedIn] = useState(session.isAuth);
   const [isLoading, setIsLoading] = useState(true);
   const [chainId, setChainId] = useState<number>();
+  const [options, setOptions] = useState<WalletProviderOptions>(props);
 
   const { isMobileDevice, globalWindow, isTest } = useEnvironment();
 
@@ -168,6 +171,10 @@ function WalletContextProvider({
     })();
   }, [globalWindow, isMobileDevice]);
 
+  useEffect(() => {
+    setOptions(props);
+  }, [props]);
+
   const signIn = useCallback(
     async (provider: AvailableProvider, callbacks: SignInCallbacks) => {
       if (!sdk) {
@@ -215,6 +222,7 @@ function WalletContextProvider({
     signIn,
     signOut,
     switchNetwork,
+    options,
   };
 
   return (

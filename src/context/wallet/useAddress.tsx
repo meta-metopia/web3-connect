@@ -16,7 +16,7 @@ import { WalletContext } from "./WalletContext";
  * ```
  */
 export function useAddresses(...chains: SupportedChain[]) {
-  const { sdk, isSignedIn } = useContext(WalletContext);
+  const { sdk, isSignedIn, options } = useContext(WalletContext);
   const {
     data: addresses,
     error,
@@ -35,7 +35,11 @@ export function useAddresses(...chains: SupportedChain[]) {
       return await sdk.getWalletAddress(...args.chains);
     },
     {
-      refreshInterval: 10_000,
+      // should not revalidate if the user chooses not to listen to account changes
+      refreshInterval: options.listenToAccountChanges ? 10_000 : 0,
+      refreshWhenOffline: options.listenToAccountChanges,
+      revalidateOnFocus: options.listenToAccountChanges,
+      revalidateOnReconnect: options.listenToAccountChanges,
     },
   );
 
