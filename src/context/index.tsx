@@ -6,3 +6,4 @@ export { useEnvironment } from "./environment/EnvironmentContext";
 export { EnvironmentProvider } from "./environment/EnvironmentProvider";
 export { EnvironmentContextProvider } from "./environment/EnvironmentContext";
 export { useSplWalletBalance } from "./wallet/useSplWalletBalance";
+export { useSession } from "./wallet/useSession";
