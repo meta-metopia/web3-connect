@@ -4,7 +4,7 @@ import {
   Transaction,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { SessionRequest, SessionResponse } from "../common";
+import { SessionResponse } from "../common";
 import { AvailableProvider } from "../common";
 import { SolanaDefaultConfig } from "../common/default-config/solana.default.config";
 import { WalletProvider } from "../providers";
@@ -63,7 +63,7 @@ export interface SignInCallbacks {
   onSignedIn?: (
     address: string,
     provider: WalletProvider,
-    session: SessionRequest,
+    session: SessionResponse,
   ) => Promise<any>;
 }
 export interface SignInOptions {
