@@ -19,8 +19,8 @@ import {
 } from "web3-connect-react";
 
 export function WalletConnect() {
-  const { sdk, signIn, signOut, isSignedIn } = useWallet();
-  const { balance, isLoading, error } = useBalance(
+  const { sdk, signIn, signOut } = useWallet();
+  const { balance, error } = useBalance(
     "ethereum",
     "solana",
     "bnb",

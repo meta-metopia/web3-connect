@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { SessionResponse } from "../common";
+import { SessionResponse, WalletAddress } from "../common";
 import { AvailableProvider } from "../common";
 import { WalletProvider } from "../providers";
 import { CallRequest } from "../providers/provider.interface";
@@ -147,9 +147,21 @@ export class Sdk implements SdkInterface {
       walletAddress,
       selectedProvider,
     );
-    const session = {
+
+    const otherAddresses = await selectedProvider.getWalletAddress(
+      ...selectedProvider.metadata.supportedChains,
+    );
+
+    const mappedWalletAddresses: WalletAddress[] =
+      selectedProvider.metadata.supportedChains?.map((chain, index) => ({
+        chain,
+        walletAddress: otherAddresses[index],
+      }));
+
+    const session: SessionResponse = {
       walletAddress: walletAddress,
       provider: selectedProvider.metadata.name,
+      walletAddresses: mappedWalletAddresses,
       ...data,
     };
     await opts.callbacks?.onSignedIn?.(
