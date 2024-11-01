@@ -37,10 +37,13 @@ export class MultiWalletProvider extends BaseProvider {
               : defaultConfig.rpcUrl,
           );
           const [solanaAddress] = await this.getWalletAddress("solana");
-          const balance = await connection.getBalance(
-            new PublicKey(solanaAddress),
-          );
-          return balance.toString();
+          if (solanaAddress) {
+            const balance = await connection.getBalance(
+              new PublicKey(solanaAddress),
+            );
+            return balance.toString();
+          }
+          return "0";
         }
         const [balance] = await this.getEthereumCompatibleChainsBalance(chain);
         return balance;
@@ -68,7 +71,7 @@ export class MultiWalletProvider extends BaseProvider {
     if (hasSol) {
       const solanaWallet = this.getSolanaProvider();
       const address = await solanaWallet.connect();
-      addresses.push(address.publicKey.toString());
+      if (address) addresses.push(address.publicKey.toString());
     }
     return addresses;
   }

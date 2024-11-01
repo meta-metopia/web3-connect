@@ -152,11 +152,12 @@ export class Sdk implements SdkInterface {
       ...selectedProvider.metadata.supportedChains,
     );
 
-    const mappedWalletAddresses: WalletAddress[] =
-      selectedProvider.metadata.supportedChains?.map((chain, index) => ({
-        chain,
-        walletAddress: otherAddresses[index],
-      }));
+    const mappedWalletAddresses: WalletAddress[] = otherAddresses.map(
+      (address, index) => ({
+        chain: selectedProvider.metadata.supportedChains[index],
+        walletAddress: address,
+      }),
+    );
 
     const session: SessionResponse = {
       walletAddress: walletAddress,

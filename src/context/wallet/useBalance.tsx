@@ -30,7 +30,10 @@ export function useBalance(...chains: SupportedChain[]) {
       if (!args.isSignedIn) {
         return chains.map(() => "0");
       }
-      const balances = await sdk.getBalance(...args.chains);
+      const balances = await sdk.getBalance(...args.chains).catch((error) => {
+        console.error("Failed to get balance", error);
+        throw error;
+      });
 
       for (const index in balances) {
         const chain = chains[index];
