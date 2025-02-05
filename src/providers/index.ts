@@ -11,3 +11,4 @@ export type {
   WalletProvider,
   MetaData,
 } from "./provider.interface";
+export * from "./walletconnect";

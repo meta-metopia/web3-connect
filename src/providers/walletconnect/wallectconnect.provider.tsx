@@ -30,10 +30,10 @@ import {
 } from "../provider.interface";
 import { WalletConnectIcon } from "./WalletConnect.icon";
 
-export class WalletConnectProvider implements WalletProvider {
-  private modal?: Web3Modal;
-  private hasSignedIn = false;
-  private isEnable = false;
+export class InternalWalletConnectProvider implements WalletProvider {
+  public modal?: Web3Modal;
+  public hasSignedIn = false;
+  public isEnable = false;
 
   constructor(_: any, config: WalletConfig, options: Web3ModalOptions) {
     try {
@@ -57,7 +57,7 @@ export class WalletConnectProvider implements WalletProvider {
     return [this.modal?.getAddress()];
   }
 
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return this.isEnable;
   }
 
@@ -146,7 +146,7 @@ export class WalletConnectProvider implements WalletProvider {
 
     try {
       const messageToBeSigned = `0x${Buffer.from(strMessage, "utf8").toString(
-        "hex",
+        "hex"
       )}`;
       const signedMessage = await provider.request({
         method: "personal_sign",
@@ -209,7 +209,7 @@ export class WalletConnectProvider implements WalletProvider {
     targetRpc: string,
     targetNetworkName: string,
     targetSymbol: string,
-    blockExplorerUrl: string,
+    blockExplorerUrl: string
   ): Promise<void> {
     throw new Error("Method not implemented.");
   }
@@ -301,3 +301,11 @@ export class WalletConnectProvider implements WalletProvider {
     throw new Error("Method not implemented.");
   }
 }
+
+export const WalletConnectProvider = (options: Web3ModalOptions) => {
+  return class WalletConnectProviderClass extends InternalWalletConnectProvider {
+    constructor(window: any, config: WalletConfig) {
+      super(window, config, options);
+    }
+  };
+};

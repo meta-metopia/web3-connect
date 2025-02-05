@@ -16,7 +16,6 @@ import {
   WalletProvider,
 } from "../../sdk";
 
-import { Web3ModalOptions } from "@web3modal/ethers";
 import { AvailableProvider } from "../../common";
 import { SdkInterface, SignInCallbacks } from "../../sdk";
 import { useEnvironment } from "../environment/EnvironmentContext";
@@ -29,7 +28,7 @@ interface IWalletContext {
   chainId?: number;
   signIn: (
     provider: AvailableProvider,
-    callbacks: SignInCallbacks,
+    callbacks: SignInCallbacks
   ) => Promise<void>;
   signOut: () => Promise<void>;
   switchNetwork: (network: SwitchToNetworkOptions) => Promise<void>;
@@ -49,17 +48,10 @@ interface WalletProviderOptions {
    */
   session: SessionResponse;
   /**
-   * Wallet connect configuration.
-   * Leave it empty if you don't want to use wallet connect.
-   */
-  walletConnectConfig?: Web3ModalOptions;
-  /**
    * Default providers to be used by the wallet.
    * This field is optional and will override existing providers if needed.
    */
-  providers: (new (
-    ...args: any[]
-  ) => WalletProvider)[];
+  providers: (new (...args: any[]) => WalletProvider)[];
 
   onSignedOut: () => Promise<void>;
 
@@ -90,7 +82,6 @@ function WalletContextProvider(props: WalletProviderOptions) {
   const {
     children,
     session,
-    walletConnectConfig,
     providers,
     environment,
     onSignedOut,
@@ -107,7 +98,7 @@ function WalletContextProvider(props: WalletProviderOptions) {
 
   const sdk = useMemo(
     () => new Sdk([], walletConfig, session),
-    [globalWindow, isMobileDevice],
+    [globalWindow, isMobileDevice]
   );
 
   useEffect(() => {
@@ -119,9 +110,7 @@ function WalletContextProvider(props: WalletProviderOptions) {
       // to avoid this error.
 
       for (const provider of providers ?? []) {
-        sdk.registerProvider(
-          new provider(globalWindow, walletConfig, walletConnectConfig),
-        );
+        sdk.registerProvider(new provider(globalWindow, walletConfig));
       }
 
       // If the environment is e2e, use the mock provider
@@ -190,7 +179,7 @@ function WalletContextProvider(props: WalletProviderOptions) {
       }
       setIsSignedIn(true);
     },
-    [sdk],
+    [sdk]
   );
 
   const signOut = useCallback(async () => {
@@ -210,7 +199,7 @@ function WalletContextProvider(props: WalletProviderOptions) {
       }
       await sdk.switchToNetwork(network);
     },
-    [sdk],
+    [sdk]
   );
 
   const value: IWalletContext = {

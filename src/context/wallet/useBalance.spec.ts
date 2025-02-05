@@ -1,5 +1,9 @@
 import { lamportsToSol } from "./useBalance";
 
+jest.mock("@web3modal/ethers", () => ({
+  __esModule: true,
+}));
+
 describe("should be able to parse lamports to sol", () => {
   const testCases = [
     {
