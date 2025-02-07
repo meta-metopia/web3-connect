@@ -39,10 +39,14 @@ export class InternalWalletConnectProvider implements WalletProvider {
     try {
       this.modal = createWeb3Modal(options);
       this.getWalletAddress().then((address) => {
+        if (address) {
+          console.log("address", address);
+        }
         this.hasSignedIn = !!address;
       });
       this.isEnable = true;
     } catch (e) {
+      console.log("error", e);
       this.isEnable = false;
     }
   }
@@ -50,11 +54,12 @@ export class InternalWalletConnectProvider implements WalletProvider {
   async getWalletAddress(
     ...chains: SupportedChain[]
   ): Promise<string[] | undefined> {
-    if (chains.length !== 0) {
-      throw new Error("Chain specific wallet address not supported");
-    }
     if (!this.modal?.getWalletProvider()) await this.sleep(1000);
-    return [this.modal?.getAddress()];
+    const address = this.modal?.getAddress();
+    if (address) {
+      return [address];
+    }
+    return undefined;
   }
 
   public isEnabled(): boolean {
@@ -178,7 +183,7 @@ export class InternalWalletConnectProvider implements WalletProvider {
     if (chainId) {
       return chainId;
     }
-    throw new Error("Chain id not found");
+    return "0x1" as any;
   }
 
   onChainChanged(callback: (chainId: number) => void): void {
@@ -302,7 +307,9 @@ export class InternalWalletConnectProvider implements WalletProvider {
   }
 }
 
-export const WalletConnectProvider = (options: Web3ModalOptions) => {
+export const WalletConnectProvider = (
+  options: Web3ModalOptions
+): new (...args: any[]) => WalletProvider => {
   return class WalletConnectProviderClass extends InternalWalletConnectProvider {
     constructor(window: any, config: WalletConfig) {
       super(window, config, options);

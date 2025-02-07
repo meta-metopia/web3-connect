@@ -6,7 +6,7 @@ import { EnvironmentProvider } from "web3-connect-react";
 
 const Providers = dynamic(
   () => import("@/app/providers").then((mod) => mod.Providers),
-  { ssr: false },
+  { ssr: !!false }
 );
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,7 +20,7 @@ export default function RootLayout(
   props: Readonly<{
     children: React.ReactNode;
     segmentPath: string[];
-  }>,
+  }>
 ) {
   return (
     <html lang="en" className="h-full">

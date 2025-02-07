@@ -20,14 +20,14 @@ export class Sdk implements SdkInterface {
   constructor(
     private readonly providers: WalletProvider[],
     private readonly walletConfig: WalletConfig,
-    session: SessionResponse | undefined,
+    session: SessionResponse | undefined
   ) {
     this.session = session;
   }
 
   registerProvider(provider: WalletProvider) {
     const foundIndex = this.providers.findIndex(
-      (p) => p.metadata.name === provider.metadata.name,
+      (p) => p.metadata.name === provider.metadata.name
     );
     provider.init();
     if (foundIndex !== -1) {
@@ -41,7 +41,7 @@ export class Sdk implements SdkInterface {
 
   private getProvider(
     name?: AvailableProvider,
-    throwError = true,
+    throwError = true
   ): WalletProvider {
     const provider = this.providers.find((p) => p.metadata.name === name);
     if (!provider && throwError) {
@@ -138,25 +138,25 @@ export class Sdk implements SdkInterface {
         opts.network.rpcUrl,
         opts.network.networkName,
         opts.network.symbol,
-        opts.network.blockExplorerUrl,
+        opts.network.blockExplorerUrl
       );
       await selectedProvider.switchNetwork(opts.network.chainId);
     }
 
     const data = await opts.callbacks?.getSignInData(
       walletAddress,
-      selectedProvider,
+      selectedProvider
     );
 
     const otherAddresses = await selectedProvider.getWalletAddress(
-      ...selectedProvider.metadata.supportedChains,
+      ...selectedProvider.metadata.supportedChains
     );
 
     const mappedWalletAddresses: WalletAddress[] = otherAddresses.map(
       (address, index) => ({
         chain: selectedProvider.metadata.supportedChains[index],
         walletAddress: address,
-      }),
+      })
     );
 
     const session: SessionResponse = {
@@ -168,7 +168,7 @@ export class Sdk implements SdkInterface {
     await opts.callbacks?.onSignedIn?.(
       walletAddress,
       selectedProvider,
-      session,
+      session
     );
 
     this.session = session;
@@ -205,7 +205,7 @@ export class Sdk implements SdkInterface {
       network.rpcUrl,
       network.networkName,
       network.symbol,
-      network.blockExplorerUrl,
+      network.blockExplorerUrl
     );
   }
 
@@ -219,7 +219,7 @@ export class Sdk implements SdkInterface {
         opts.rpcUrl,
         opts.networkName,
         opts.symbol,
-        opts.blockExplorerUrl,
+        opts.blockExplorerUrl
       )
       .catch(() => {
         console.error("Failed to add network");

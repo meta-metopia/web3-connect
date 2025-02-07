@@ -6,6 +6,7 @@ import {
   MetaMaskProvider,
   OKXProvider,
   PhantomProvider,
+  WalletConnectProvider,
 } from "web3-connect-react/providers";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -18,7 +19,31 @@ export function Providers({ children }: { children: ReactNode }) {
         sessionStorage.removeItem("session");
       }}
       session={parsedSession}
-      providers={[MetaMaskProvider, OKXProvider, PhantomProvider]}
+      providers={[
+        MetaMaskProvider,
+        OKXProvider,
+        PhantomProvider,
+        WalletConnectProvider({
+          projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!,
+          chains: [
+            {
+              chainId: 1,
+              name: "Ethereum",
+              currency: "ETH",
+              rpcUrl: "https://cloudflare-eth.com",
+              explorerUrl: "https://etherscan.io",
+            },
+          ],
+          ethersConfig: {
+            metadata: {
+              name: "",
+              description: "",
+              url: "",
+              icons: [],
+            },
+          },
+        }),
+      ]}
       listenToChainChanges={false}
       listenToAccountChanges={false}
       walletConfig={{
