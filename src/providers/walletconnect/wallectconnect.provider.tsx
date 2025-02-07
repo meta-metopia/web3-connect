@@ -39,6 +39,9 @@ export class InternalWalletConnectProvider implements WalletProvider {
     try {
       this.modal = createWeb3Modal(options);
       this.getWalletAddress().then((address) => {
+        if (address) {
+          console.log("address", address);
+        }
         this.hasSignedIn = !!address;
       });
       this.isEnable = true;
@@ -52,7 +55,11 @@ export class InternalWalletConnectProvider implements WalletProvider {
     ...chains: SupportedChain[]
   ): Promise<string[] | undefined> {
     if (!this.modal?.getWalletProvider()) await this.sleep(1000);
-    return [this.modal?.getAddress()];
+    const address = this.modal?.getAddress();
+    if (address) {
+      return [address];
+    }
+    return undefined;
   }
 
   public isEnabled(): boolean {
@@ -75,7 +82,6 @@ export class InternalWalletConnectProvider implements WalletProvider {
       };
     }
 
-    console.log("open modal", this.modal);
     await this.modal?.open();
 
     return new Promise((resolve, reject) => {
@@ -177,7 +183,7 @@ export class InternalWalletConnectProvider implements WalletProvider {
     if (chainId) {
       return chainId;
     }
-    throw new Error("Chain id not found");
+    return "0x1" as any;
   }
 
   onChainChanged(callback: (chainId: number) => void): void {

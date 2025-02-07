@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -18,11 +18,11 @@
     "biome": "^0.3.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "framer-motion": "^11.11.9",
+    "framer-motion": "^12.4.0",
     "lucide-react": "^0.453.0",
-    "next": "14.2.15",
-    "react": "^18",
-    "react-dom": "^18",
+    "next": "15.1.6",
+    "react": "^19",
+    "react-dom": "^19",
     "react-hook-form": "^7.53.1",
     "semver": "^7.6.3",
     "sonner": "^1.5.0",
@@ -41,5 +41,8 @@
     "typescript": "^5",
     "vercel": "^37.11.0",
     "web3-connect-react": "file:../.."
+  },
+  "pnpm": {
+    "overrides": {}
   }
 }

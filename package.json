@@ -29,7 +29,7 @@
     "validator:start": "solana-test-validator --reset &",
     "validator:stop": "pkill solana-test-validator || true",
     "format": "biome format --write .",
-    "build": "rm -rf dist && tsc && npm link",
+    "build": "rm -rf dist && tsc",
     "prepublish": "pnpm build"
   },
   "keywords": [],

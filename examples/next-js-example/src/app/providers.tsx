@@ -30,8 +30,7 @@ export function Providers({ children }: { children: ReactNode }) {
               chainId: 1,
               name: "Ethereum",
               currency: "ETH",
-              rpcUrl:
-                "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+              rpcUrl: "https://cloudflare-eth.com",
               explorerUrl: "https://etherscan.io",
             },
           ],
