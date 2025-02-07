@@ -24,12 +24,12 @@ export function WalletConnect() {
     "ethereum",
     "solana",
     "bnb",
-    "optimism",
+    "optimism"
   );
   const router = useRouter();
   const { addresses, isLoading: isAddressesLoading } = useAddresses(
     "ethereum",
-    "solana",
+    "solana"
   );
 
   const handleSignOut = async () => {
@@ -103,11 +103,11 @@ export function WalletConnect() {
           <div className="space-y-4">
             {sdk?.walletProviders
               .filter((p) => p.isVisible(false))
-              .map((p) => {
+              .map((p, index) => {
                 const isConnected =
                   sdk.provider?.metadata.name === p.metadata.name;
                 return (
-                  <Card key={p.metadata.name}>
+                  <Card key={`${p.metadata.name}-${index}`}>
                     <CardContent className="flex items-center justify-between p-4 flex-wrap space-y-4">
                       <div>
                         <div className="font-semibold flex flex-row items-center space-x-2">
@@ -125,8 +125,8 @@ export function WalletConnect() {
                           isConnected
                             ? "ghost"
                             : p.isEnabled(sdk.walletProviders)
-                              ? "default"
-                              : "secondary"
+                            ? "default"
+                            : "secondary"
                         }
                         onClick={async () => {
                           if (p.isEnabled(sdk.walletProviders)) {
@@ -141,8 +141,8 @@ export function WalletConnect() {
                         {isConnected
                           ? "Connected"
                           : p.isEnabled(sdk.walletProviders)
-                            ? "Connect"
-                            : "Not Installed"}
+                          ? "Connect"
+                          : "Not Installed"}
                       </Button>
                     </CardContent>
                   </Card>
@@ -154,10 +154,7 @@ export function WalletConnect() {
             <ol>
               {!isAddressesLoading &&
                 addresses.map((address, index) => (
-                  <li
-                    key={address ?? `unknown-${index}`}
-                    className={"break-all"}
-                  >
+                  <li key={`${address}-${index}`} className={"break-all"}>
                     <b>{getChainName(index)}</b> {address}
                   </li>
                 ))}
@@ -166,12 +163,7 @@ export function WalletConnect() {
             <ol>
               {error && <li>{error.message}</li>}
               {balance?.map((balance, index) => (
-                <li
-                  key={`unknown-${
-                    // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                    index
-                  }`}
-                >
+                <li key={`unknown-${index}`}>
                   {getChainName(index)}: {balance}
                 </li>
               ))}

@@ -43,6 +43,7 @@ export class InternalWalletConnectProvider implements WalletProvider {
       });
       this.isEnable = true;
     } catch (e) {
+      console.log("error", e);
       this.isEnable = false;
     }
   }
@@ -50,9 +51,6 @@ export class InternalWalletConnectProvider implements WalletProvider {
   async getWalletAddress(
     ...chains: SupportedChain[]
   ): Promise<string[] | undefined> {
-    if (chains.length !== 0) {
-      throw new Error("Chain specific wallet address not supported");
-    }
     if (!this.modal?.getWalletProvider()) await this.sleep(1000);
     return [this.modal?.getAddress()];
   }
@@ -77,6 +75,7 @@ export class InternalWalletConnectProvider implements WalletProvider {
       };
     }
 
+    console.log("open modal", this.modal);
     await this.modal?.open();
 
     return new Promise((resolve, reject) => {
@@ -302,7 +301,9 @@ export class InternalWalletConnectProvider implements WalletProvider {
   }
 }
 
-export const WalletConnectProvider = (options: Web3ModalOptions) => {
+export const WalletConnectProvider = (
+  options: Web3ModalOptions
+): new (...args: any[]) => WalletProvider => {
   return class WalletConnectProviderClass extends InternalWalletConnectProvider {
     constructor(window: any, config: WalletConfig) {
       super(window, config, options);
