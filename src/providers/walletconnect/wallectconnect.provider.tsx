@@ -199,6 +199,7 @@ export class InternalWalletConnectProvider implements WalletProvider {
     description:
       "Connect by scanning a QR code with any supported mobile wallet.",
     image: <WalletConnectIcon />,
+    iconBackgroundColor: "#ffffff",
     displayName: "Wallet Connect",
     notInstalledText:
       "WalletConnect is not available at this moment. Please try again later.",
